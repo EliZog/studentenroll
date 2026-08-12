@@ -1,18 +1,29 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Lock, X, Clock, Calendar, Mail, AlertTriangle, ArrowRight } from "lucide-react";
 
 export default function RestrictionModal({ isOpen, onClose, onJoinWaitlist, course, section }) {
-  if (!isOpen) return null;
+  // Retain the last active course/section during fade-out exit animation
+  const [activeCourse, setActiveCourse] = useState(null);
+  const [activeSection, setActiveSection] = useState(null);
+
+  useEffect(() => {
+    if (course && section) {
+      setActiveCourse(course);
+      setActiveSection(section);
+    }
+  }, [course, section]);
+
+  if (!activeCourse || !activeSection) return null;
 
   // Fallbacks in case course or section is missing
-  const courseCode = course?.code || "CSC358H5";
-  const courseTitle = course?.title || "Principles of Computer Networks";
-  const sectionName = section?.name || "LEC 0101";
-  const sectionTime = section?.time || "Tuesday 3:00PM-5:00PM";
-  const sectionLocation = section?.location || "MN 1190";
-  const sectionInstructor = section?.instructor || "TBA";
+  const courseCode = activeCourse.code;
+  const courseTitle = activeCourse.title;
+  const sectionName = activeSection.name;
+  const sectionTime = activeSection.time;
+  const sectionLocation = activeSection.location;
+  const sectionInstructor = activeSection.instructor;
 
-  const restrictionDetail = section?.restrictionDetail || {
+  const restrictionDetail = activeSection.restrictionDetail || {
     type: "Departmental Restriction",
     reason: "This lecture section is currently reserved for Computer Science specialists.",
     temporary: true,
@@ -21,18 +32,28 @@ export default function RestrictionModal({ isOpen, onClose, onJoinWaitlist, cour
   };
 
   return (
-    <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 sm:p-gutter">
+    <div 
+      className={`fixed inset-0 z-[1000] flex items-center justify-center p-4 sm:p-gutter transition-all duration-300 ease-out ${
+        isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+      }`}
+    >
       {/* Dim/Blur Overlay */}
       <div 
-        className="absolute inset-0 bg-[#263143]/60 backdrop-blur-overlay transition-opacity duration-300"
+        className={`absolute inset-0 bg-[#263143]/60 backdrop-blur-overlay transition-opacity duration-300 ease-out ${
+          isOpen ? "opacity-100" : "opacity-0"
+        }`}
         onClick={onClose}
       ></div>
 
-      {/* Modal Card */}
-      <div className="bg-white w-full max-w-2xl rounded-xl modal-shadow flex flex-col max-h-[95vh] overflow-hidden relative z-10 animate-in fade-in zoom-in-95 slide-in-from-bottom-8 duration-300 ease-out">
+      {/* Modal Card: width scale and slide transitions */}
+      <div 
+        className={`bg-white w-full max-w-2xl rounded-xl modal-shadow flex flex-col max-h-[95vh] overflow-hidden relative z-10 transition-all duration-300 ease-out transform ${
+          isOpen ? "translate-y-0 scale-100 opacity-100" : "translate-y-8 scale-95 opacity-0"
+        }`}
+      >
         
         {/* Modal Header */}
-        <div className="flex items-start justify-between px-container-padding py-6 border-b border-[#dde3ed]">
+        <div className="flex items-start justify-between px-container-padding py-6 border-b border-[#dde3ed] shrink-0 bg-white">
           <div className="flex items-center gap-3">
             <div className="bg-[#1a3c6e]/10 p-2 rounded-lg flex items-center justify-center">
               <Lock className="text-[#1a3c6e] w-6 h-6" />

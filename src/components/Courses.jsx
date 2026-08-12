@@ -433,7 +433,9 @@ export default function Courses({
         isOpen={isSearchOpen}
         onClose={() => {
           setIsSearchOpen(false);
-          setSelectedCourse(null);
+          setTimeout(() => {
+            setSelectedCourse(null);
+          }, 300);
         }}
         selectedCourse={selectedCourse}
         onAddToCart={handleAddToCart}
