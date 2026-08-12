@@ -1,0 +1,497 @@
+import React, { useState, useEffect } from "react";
+import { X, Users, Calendar, AlertTriangle } from "lucide-react";
+
+export default function CourseModal({ 
+  isOpen, 
+  onClose, 
+  selectedCourse,
+  onAddToCart, 
+  onEnrol,
+  enrolledCourses,
+  waitlistedCourses,
+  cartPlanA,
+  cartPlanB,
+  selectedPlan
+}) {
+  // Form states
+  const [selectedLec, setSelectedLec] = useState("");
+  const [selectedTut, setSelectedTut] = useState("");
+  const [error, setError] = useState("");
+
+  // Collapsible Timetable state
+  const [showModalTimetable, setShowModalTimetable] = useState(true);
+
+  const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+  const hours = [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
+
+  // Reset choices when selected course changes
+  useEffect(() => {
+    setSelectedLec("");
+    setSelectedTut("");
+    setError("");
+  }, [selectedCourse]);
+
+  if (!isOpen || !selectedCourse) return null;
+
+  const isEnrolledOrWaitlisted = (courseCode) => {
+    return enrolledCourses.some(c => c.code === courseCode) || waitlistedCourses.some(c => c.code === courseCode);
+  };
+
+  const handleAction = (actionType, plan = "A") => {
+    if (isEnrolledOrWaitlisted(selectedCourse.code)) {
+      setError("You are already enrolled or waitlisted in this course.");
+      return;
+    }
+    
+    // Find selected lecture section
+    const lecObj = selectedCourse.sections.find(s => s.id === selectedLec);
+    if (!lecObj) {
+      setError("Please select a Lecture section.");
+      return;
+    }
+
+    // Find selected tutorial section (if course has tutorials)
+    let tutObj = null;
+    if (selectedCourse.tutorials && selectedCourse.tutorials.length > 0) {
+      tutObj = selectedCourse.tutorials.find(t => t.id === selectedTut);
+      if (!tutObj) {
+        setError("Please select a Tutorial/Practical section.");
+        return;
+      }
+    }
+
+    const sectionWithTut = {
+      ...lecObj,
+      selectedTutorial: tutObj
+    };
+
+    if (actionType === "cart") {
+      onAddToCart(selectedCourse, sectionWithTut, plan);
+      onClose();
+    } else if (actionType === "enrol") {
+      onEnrol(selectedCourse, sectionWithTut);
+      onClose();
+    }
+  };
+
+  // Compile timetable mapping for live preview inside modal
+  const getModalEvents = () => {
+    const events = [];
+
+    // 1. Enrolled courses (shown as muted background, ignoring the current course to avoid self-conflict warnings)
+    enrolledCourses.forEach(course => {
+      if (course.code === selectedCourse.code) return; // Prevent self-overlap bug
+
+      const section = course.selectedSection;
+      if (!section) return;
+
+      const eventDetails = {
+        code: course.code,
+        name: section.name,
+        color: "bg-blue-50/50 border-blue-200/50 text-[#002a5c]/60",
+        isCurrentCourse: false,
+        isPreview: false
+      };
+
+      if (section.days) {
+        section.days.forEach(day => {
+          events.push({ ...eventDetails, day, start: section.startHour, end: section.endHour });
+        });
+      } else {
+        events.push({ ...eventDetails, day: section.day, start: section.startHour, end: section.endHour });
+      }
+
+      if (section.selectedTutorial) {
+        const tut = section.selectedTutorial;
+        events.push({
+          code: course.code,
+          name: tut.name,
+          color: "bg-slate-50/50 border-slate-200/30 text-slate-400",
+          day: tut.day,
+          start: tut.startHour,
+          end: tut.endHour,
+          isCurrentCourse: false,
+          isPreview: false
+        });
+      }
+    });
+
+    // 2. Cart courses (Plan A or B based on active cart tab context, ignoring current course to avoid self-conflict)
+    const activeCart = selectedPlan === "A" ? cartPlanA : cartPlanB;
+    const cartColor = selectedPlan === "A"
+      ? "bg-purple-50/50 border-purple-200/50 text-purple-800/60"
+      : "bg-emerald-50/50 border-emerald-200/50 text-emerald-800/60";
+
+    activeCart.forEach(course => {
+      if (course.code === selectedCourse.code) return; // Prevent self-overlap bug
+
+      const section = course.selectedSection;
+      if (!section) return;
+
+      const eventDetails = {
+        code: course.code,
+        name: section.name,
+        color: cartColor,
+        isCurrentCourse: false,
+        isPreview: false
+      };
+
+      if (section.days) {
+        section.days.forEach(day => {
+          events.push({ ...eventDetails, day, start: section.startHour, end: section.endHour });
+        });
+      } else {
+        events.push({ ...eventDetails, day: section.day, start: section.startHour, end: section.endHour });
+      }
+
+      if (section.selectedTutorial) {
+        const tut = section.selectedTutorial;
+        events.push({
+          code: course.code,
+          name: tut.name,
+          color: "bg-slate-50/50 border-slate-200/30 text-slate-400",
+          day: tut.day,
+          start: tut.startHour,
+          end: tut.endHour,
+          isCurrentCourse: false,
+          isPreview: false
+        });
+      }
+    });
+
+    // 3. Live configuration preview blocks (Lecture & Tutorial selected in form)
+    const lecObj = selectedCourse.sections.find(s => s.id === selectedLec);
+    if (lecObj) {
+      const lecDetails = {
+        code: selectedCourse.code,
+        name: `${lecObj.name} (Preview)`,
+        color: "bg-amber-100 border-amber-500 border-dashed text-amber-900 font-bold",
+        isCurrentCourse: true,
+        isPreview: true,
+        start: lecObj.startHour,
+        end: lecObj.endHour
+      };
+
+      if (lecObj.days) {
+        lecObj.days.forEach(day => {
+          events.push({ ...lecDetails, day });
+        });
+      } else {
+        events.push({ ...lecDetails, day: lecObj.day });
+      }
+    }
+
+    if (selectedCourse.tutorials) {
+      const tutObj = selectedCourse.tutorials.find(t => t.id === selectedTut);
+      if (tutObj) {
+        events.push({
+          code: selectedCourse.code,
+          name: `${tutObj.name} (Preview)`,
+          color: "bg-amber-50 border-amber-400 border-dashed text-amber-800 font-bold",
+          day: tutObj.day,
+          start: tutObj.startHour,
+          end: tutObj.endHour,
+          isCurrentCourse: true,
+          isPreview: true
+        });
+      }
+    }
+
+    return events;
+  };
+
+  const modalEvents = getModalEvents();
+
+  const getEventForCell = (day, hour) => {
+    const cellEvents = modalEvents.filter(e => e.day === day && hour >= e.start && hour < e.end);
+    if (cellEvents.length === 0) return null;
+
+    // Conflict detection: preview slot overlaps active classes
+    if (cellEvents.length > 1) {
+      const preview = cellEvents.find(e => e.isPreview);
+      const background = cellEvents.find(e => !e.isPreview);
+      return {
+        code: "CONFLICT",
+        name: `Overlaps ${background?.code}`,
+        color: "bg-red-100 border-red-500 text-red-700 border-2 font-bold animate-pulse text-[8px]",
+        start: Math.min(...cellEvents.map(e => e.start)),
+        end: Math.max(...cellEvents.map(e => e.end))
+      };
+    }
+
+    return cellEvents[0];
+  };
+
+  return (
+    <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 sm:p-gutter">
+      {/* Backdrop blur overlay */}
+      <div 
+        className="absolute inset-0 bg-[#263143]/60 backdrop-blur-overlay transition-opacity duration-300"
+        onClick={onClose}
+      ></div>
+
+      {/* Modal Container */}
+      <div className="bg-white w-full max-w-6xl rounded-xl modal-shadow flex flex-col h-[85vh] overflow-hidden relative z-10 animate-in fade-in zoom-in-95 slide-in-from-bottom-8 duration-300 ease-out">
+        
+        {/* Modal Header */}
+        <div className="flex items-start justify-between px-container-padding py-4 border-b border-[#dde3ed] shrink-0">
+          <h2 className="font-bold text-[#002a5c] text-lg">Select Sections</h2>
+          <button 
+            onClick={onClose}
+            className="text-slate-400 hover:text-slate-600 transition-colors p-1 rounded-full hover:bg-slate-100"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Modal Body: Two column split */}
+        <div className="flex-1 flex overflow-hidden">
+          
+          {/* Column 1: Course Selection Form - Sized w-[380px] */}
+          <div className="w-[380px] border-r border-[#dde3ed] flex flex-col overflow-hidden shrink-0 bg-white">
+            {/* Course Header */}
+            <div className="p-5 border-b border-slate-100 shrink-0">
+              <div className="flex items-center gap-2">
+                <h3 className="text-base font-bold text-[#002a5c]">{selectedCourse.code}</h3>
+                <span className="px-1.5 py-0.2 rounded bg-slate-100 text-slate-500 text-[8px] font-bold tracking-wider">
+                  {selectedCourse.term}
+                </span>
+              </div>
+              <h4 className="font-bold text-slate-700 text-xs mt-0.5">{selectedCourse.title}</h4>
+              <p className="text-[9px] text-slate-400 mt-0.5">{selectedCourse.department}</p>
+            </div>
+
+            {/* Form Body (Scrollable) */}
+            <div className="p-5 overflow-y-auto custom-scrollbar flex-1 flex flex-col gap-4">
+              {error && (
+                <div className="bg-red-50 border border-red-200 text-red-700 text-xs p-2.5 rounded shrink-0">
+                  {error}
+                </div>
+              )}
+
+              {/* Course Description */}
+              <div className="text-xs text-slate-500 leading-relaxed bg-slate-50 p-3 rounded">
+                {selectedCourse.description}
+              </div>
+
+              {/* Lecture Radio Select */}
+              <div className="flex flex-col gap-2">
+                <h5 className="text-[9px] font-bold text-slate-400 tracking-wider uppercase">Select Lecture Section</h5>
+                <div className="flex flex-col gap-2">
+                  {selectedCourse.sections.map(section => (
+                    <label 
+                      key={section.id}
+                      className={`border rounded-lg p-3 flex items-start gap-2.5 cursor-pointer transition-all hover:bg-slate-50/50 ${
+                        selectedLec === section.id 
+                          ? "border-acorn-blue bg-blue-50/10 shadow-xs" 
+                          : "border-slate-200"
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="lecture"
+                        value={section.id}
+                        checked={selectedLec === section.id}
+                        onChange={() => setSelectedLec(section.id)}
+                        className="mt-1 text-acorn-blue focus:ring-acorn-blue"
+                      />
+                      <div className="flex-1 flex justify-between items-start gap-2">
+                        <div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-bold text-xs text-slate-800">{section.name}</span>
+                            {section.restricted && (
+                              <span className="px-1.5 py-0.2 rounded bg-amber-50 text-amber-700 border border-amber-100 text-[8px] font-bold uppercase">
+                                Restricted
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs text-slate-600 mt-1">{section.time}</p>
+                          <p className="text-[9px] text-slate-400 mt-0.5">{section.location} • {section.instructor}</p>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <span className="text-[10px] text-slate-500 font-semibold flex items-center gap-1 justify-end">
+                            <Users className="w-3 h-3 text-slate-400" />
+                            <span>{section.enrolled}/{section.capacity}</span>
+                          </span>
+                        </div>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Tutorial/Practical Radio Select */}
+              {selectedCourse.tutorials && selectedCourse.tutorials.length > 0 && (
+                <div className="flex flex-col gap-2">
+                  <h5 className="text-[9px] font-bold text-slate-400 tracking-wider uppercase">Select Practical / Tutorial Section</h5>
+                  <div className="flex flex-col gap-2">
+                    {selectedCourse.tutorials.map(tut => (
+                      <label 
+                        key={tut.id}
+                        className={`border rounded-lg p-3 flex items-start gap-2.5 cursor-pointer transition-all hover:bg-slate-50/50 ${
+                          selectedTut === tut.id 
+                            ? "border-acorn-blue bg-blue-50/10 shadow-xs" 
+                            : "border-slate-200"
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="tutorial"
+                          value={tut.id}
+                          checked={selectedTut === tut.id}
+                          onChange={() => setSelectedTut(tut.id)}
+                          className="mt-1 text-acorn-blue focus:ring-acorn-blue"
+                        />
+                        <div className="flex-1 text-left">
+                          <span className="font-bold text-xs text-slate-800">{tut.name}</span>
+                          <p className="text-xs text-slate-600 mt-1">{tut.time}</p>
+                          <p className="text-[9px] text-slate-400 mt-0.5">{tut.location}</p>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+            </div>
+
+            {/* Form Footer */}
+            <div className="p-3.5 border-t border-slate-200 bg-slate-50 flex justify-end gap-2 shrink-0">
+              <button
+                disabled={isEnrolledOrWaitlisted(selectedCourse.code)}
+                onClick={() => handleAction("cart", "A")}
+                className={`px-3 py-1.5 border rounded font-semibold text-xs shadow-xs transition-colors bg-white ${
+                  isEnrolledOrWaitlisted(selectedCourse.code)
+                    ? "border-slate-100 text-slate-300 cursor-not-allowed"
+                    : "border-slate-200 text-slate-600 hover:bg-slate-50"
+                }`}
+              >
+                Add Plan A
+              </button>
+              <button
+                disabled={isEnrolledOrWaitlisted(selectedCourse.code)}
+                onClick={() => handleAction("cart", "B")}
+                className={`px-3 py-1.5 border rounded font-semibold text-xs shadow-xs transition-colors bg-white ${
+                  isEnrolledOrWaitlisted(selectedCourse.code)
+                    ? "border-slate-100 text-slate-300 cursor-not-allowed"
+                    : "border-slate-200 text-slate-600 hover:bg-slate-50"
+                }`}
+              >
+                Add Plan B
+              </button>
+              <button
+                disabled={isEnrolledOrWaitlisted(selectedCourse.code)}
+                onClick={() => handleAction("enrol")}
+                className={`px-3 py-1.5 rounded font-semibold text-xs shadow-xs transition-colors text-white ${
+                  isEnrolledOrWaitlisted(selectedCourse.code)
+                    ? "bg-slate-100 text-slate-300 cursor-not-allowed"
+                    : "bg-[#002a5c] hover:bg-[#001b3f]"
+                }`}
+              >
+                Enrol
+              </button>
+            </div>
+          </div>
+
+          {/* Column 2: Live Preview Timetable Grid - Animated width (drawer style) */}
+          <div 
+            className={`transition-all duration-300 ease-in-out flex flex-col overflow-hidden bg-slate-50/40 shrink-0 ${
+              showModalTimetable ? "w-[500px] border-l border-[#dde3ed] opacity-100" : "w-0 border-l-0 opacity-0"
+            }`}
+          >
+            <div className="p-4 border-b border-[#dde3ed] flex justify-between items-center shrink-0 bg-white">
+              <span className="text-[10px] font-bold text-slate-400 tracking-wider uppercase flex items-center gap-1">
+                <Calendar className="w-3.5 h-3.5 text-acorn-blue" />
+                <span>Schedule Preview</span>
+              </span>
+              <button
+                onClick={() => setShowModalTimetable(false)}
+                className="text-[10px] font-bold text-slate-400 hover:text-slate-600 uppercase"
+              >
+                Hide Timetable
+              </button>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto custom-scrollbar p-4">
+              <div className="flex flex-col gap-2 mb-3">
+                <div className="flex flex-wrap gap-2 text-[8px] font-bold">
+                  <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm bg-blue-50 border border-blue-200 block opacity-55"></span><span className="text-slate-500">Active Classes</span></span>
+                  <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm bg-amber-100 border border-amber-500 border-dashed block"></span><span className="text-slate-600">Selected Preview</span></span>
+                </div>
+                {modalEvents.some(e => e.code === "CONFLICT") && (
+                  <div className="bg-red-50 border border-red-200 text-red-700 text-[10px] p-2 rounded flex items-center gap-1.5 font-semibold">
+                    <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                    <span>Warning: Schedule Conflict!</span>
+                  </div>
+                )}
+              </div>
+
+              <div className="overflow-x-auto border border-slate-200 rounded bg-white">
+                <table className="w-full border-collapse text-center">
+                  <thead>
+                    <tr className="border-b border-slate-200 bg-slate-50/50">
+                      <th className="w-12 p-1.5 text-[8px] font-bold text-slate-400 border-r border-slate-100">Time</th>
+                      {days.map(d => (
+                        <th key={d} className="p-1.5 text-[8px] font-bold text-slate-500 border-r border-slate-100 uppercase">{d}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {hours.map(hour => (
+                      <tr key={hour} className="h-9 border-b border-slate-100">
+                        <td className="p-1 text-[8px] font-bold text-slate-400 border-r border-slate-100 bg-slate-50/20 align-middle">
+                          {hour > 12 ? `${hour - 12} PM` : hour === 12 ? "12 PM" : `${hour} AM`}
+                        </td>
+                        {days.map(day => {
+                          const event = getEventForCell(day, hour);
+                          const isStart = event && event.start === hour;
+                          const duration = event ? event.end - event.start : 1;
+
+                          if (event && !isStart) return null;
+
+                          return (
+                            <td
+                              key={day}
+                              rowSpan={isStart ? duration : 1}
+                              className={`p-0.5 border-r border-slate-100 align-middle relative ${
+                                event ? "" : "hover:bg-slate-50/10"
+                              }`}
+                            >
+                              {event ? (
+                                <div className={`h-full rounded px-1.5 py-1 flex flex-col justify-center text-[8px] font-bold leading-tight overflow-hidden ${event.color}`}>
+                                  <span className="truncate">{event.code}</span>
+                                  <span className="text-[7px] opacity-85 truncate">{event.name}</span>
+                                </div>
+                              ) : null}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          {/* Show Preview vertical tab (Visible when timetable drawer collapses) */}
+          <div 
+            className={`transition-all duration-300 ease-in-out shrink-0 flex ${
+              showModalTimetable ? "w-0 opacity-0 overflow-hidden" : "w-10 border-l border-[#dde3ed] opacity-100"
+            }`}
+          >
+            <button 
+              onClick={() => setShowModalTimetable(true)}
+              className="w-full flex flex-col items-center py-4 bg-slate-50/30 hover:bg-slate-100/50 transition-colors text-slate-400 hover:text-slate-600 cursor-pointer"
+            >
+              <Calendar className="w-4 h-4 mb-2 animate-bounce" />
+              <span className="text-[9px] font-bold uppercase tracking-wider [writing-mode:vertical-lr] select-none">Show Preview</span>
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  );
+}

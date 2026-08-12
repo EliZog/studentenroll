@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ACORN - Why can't I enrol?</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "background-alt": "#F1F5F9",
+                      "tertiary-container": "#4f1b02",
+                      "on-tertiary-fixed-variant": "#723519",
+                      "surface-container": "#e7eeff",
+                      "on-secondary-fixed-variant": "#41474f",
+                      "inverse-surface": "#263143",
+                      "background": "#f9f9ff",
+                      "warning-bg": "#FFF3D1",
+                      "tertiary-fixed": "#ffdbcd",
+                      "tertiary-fixed-dim": "#ffb597",
+                      "surface-container-lowest": "#ffffff",
+                      "error": "#ba1a1a",
+                      "on-tertiary-fixed": "#360f00",
+                      "primary-fixed": "#d7e2ff",
+                      "inverse-on-surface": "#ecf1ff",
+                      "surface-dim": "#cfdaf2",
+                      "on-background": "#111c2d",
+                      "on-tertiary-container": "#ce7f5d",
+                      "secondary-fixed": "#dde3ed",
+                      "on-error-container": "#93000a",
+                      "success-green": "#166534",
+                      "on-secondary": "#ffffff",
+                      "warning-text": "#854D0E",
+                      "on-tertiary": "#ffffff",
+                      "surface-container-high": "#dee8ff",
+                      "surface-container-low": "#f0f3ff",
+                      "on-error": "#ffffff",
+                      "surface-tint": "#405e93",
+                      "primary-container": "#002a5c",
+                      "on-surface": "#111c2d",
+                      "on-primary-fixed": "#001b3f",
+                      "outline": "#747780",
+                      "on-primary-container": "#7593cb",
+                      "secondary-container": "#dde3ed",
+                      "surface-variant": "#d8e3fb",
+                      "on-secondary-fixed": "#161c23",
+                      "on-surface-variant": "#43474f",
+                      "inverse-primary": "#abc7ff",
+                      "outline-variant": "#c4c6d1",
+                      "on-primary-fixed-variant": "#264679",
+                      "on-secondary-container": "#5e656d",
+                      "on-primary": "#ffffff",
+                      "surface-container-highest": "#d8e3fb",
+                      "secondary-fixed-dim": "#c1c7d1",
+                      "surface": "#f9f9ff",
+                      "tertiary": "#2f0c00",
+                      "surface-bright": "#f9f9ff",
+                      "secondary": "#585f67",
+                      "primary-fixed-dim": "#abc7ff",
+                      "primary": "#001636",
+                      "error-container": "#ffdad6"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "gutter": "16px",
+                      "base": "8px",
+                      "container-padding": "24px",
+                      "sidebar-width": "280px",
+                      "section-gap": "40px"
+              },
+              "fontFamily": {
+                      "headline-lg": [
+                              "Inter"
+                      ],
+                      "headline-lg-mobile": [
+                              "Inter"
+                      ],
+                      "body-sm": [
+                              "Inter"
+                      ],
+                      "headline-md": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "label-md": [
+                              "Inter"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "headline-sm": [
+                              "Inter"
+                      ],
+                      "label-sm": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "28px",
+                              {
+                                      "lineHeight": "34px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-sm": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.01em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-sm": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.02em",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+        .modal-shadow {
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.15), 0 4px 10px -2px rgba(0, 0, 0, 0.05);
+        }
+        .backdrop-blur-overlay {
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+    </style>
+</head>
+<body class="bg-background-alt h-screen w-screen overflow-hidden font-body-md text-on-surface antialiased">
+<!-- Background Image Layer -->
+<div class="fixed inset-0 z-0">
+<div class="absolute inset-0 bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCVSRbI2slKQoS-yVkZFWxNSZzPuupKXDYC6RRQ-r0kSighIApgl6tAUXuXQK7pvG_wSzaVcS0QJmTArvld6jdgWgfaZT7zL8-vT3U0NcTyk5BxewohfsDGyEfRQ2b17N4MkGfeI-mlg8izZFM1_aRcuaYZZ_EP9QKqrXbCyDpOW7um2x3VzTuZtm7RgzT9SafkbEldHP-5M2WohrouE0r4Ep6H80Pk50t3rDmEYow0G55GdZY8mEojEGhB23RGKtvK');"></div>
+<!-- Dim/Blur Overlay -->
+<div class="absolute inset-0 bg-inverse-surface/60 backdrop-blur-overlay"></div>
+</div>
+<!-- Modal Container -->
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-gutter">
+<!-- Modal Card -->
+<div class="bg-surface-container-lowest w-full max-w-2xl rounded-xl modal-shadow flex flex-col max-h-[95vh] overflow-hidden">
+<!-- Modal Header -->
+<div class="flex items-start justify-between px-container-padding py-6 border-b border-outline-variant/30">
+<div class="flex items-center gap-3">
+<div class="bg-[#1a3c6e]/10 p-2 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-[#1a3c6e] text-[28px]" style="font-variation-settings: 'FILL' 0;">lock</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-[#1a3c6e]">Why can't I enrol?</h2>
+</div>
+<button aria-label="Close modal" class="text-on-surface-variant hover:text-on-surface transition-colors p-1 rounded-full hover:bg-background-alt">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<!-- Modal Body (Scrollable) -->
+<div class="px-container-padding py-6 overflow-y-auto custom-scrollbar flex-1 flex flex-col gap-6">
+<!-- Course Context -->
+<div class="flex flex-col gap-2">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">CSC358H5 S (Winter) — Principles of Computer Networks</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">LEC 0101 — Tuesday 3:00PM-5:00PM, MN 1190, Instructor TBA.</p>
+</div>
+<!-- Restriction Details Card -->
+<div class="bg-background-alt rounded-lg border border-outline-variant/50 p-5 flex flex-col gap-4">
+<div class="flex items-start justify-between">
+<span class="inline-flex items-center px-3 py-1 rounded-full bg-error/10 text-error font-label-sm text-label-sm border border-error/20">
+                            Departmental Restriction
+                        </span>
+</div>
+<div class="mt-2">
+<p class="font-body-md text-body-md text-on-surface">
+                            This lecture section is currently reserved for Computer Science specialists.
+                        </p>
+</div>
+<div class="h-px bg-outline-variant/30 w-full my-1"></div>
+<!-- Detail Rows -->
+<div class="flex flex-col gap-3">
+<div class="flex items-center gap-3 text-on-surface-variant">
+<span class="material-symbols-outlined text-outline">schedule</span>
+<span class="font-body-sm text-body-sm">Temporary Restriction</span>
+</div>
+<div class="flex items-center gap-3 text-on-surface-variant">
+<span class="material-symbols-outlined text-outline">calendar_today</span>
+<span class="font-body-sm text-body-sm">Restriction review: July 24, 2026</span>
+</div>
+<div class="flex items-center gap-3 text-on-surface-variant">
+<span class="material-symbols-outlined text-outline">mail</span>
+<div class="font-body-sm text-body-sm">
+                                Contact: Dept of Mathematical &amp; Computational Sciences 
+                                <a class="text-surface-tint hover:underline ml-1 font-medium" href="#">Contact Dept</a>
+</div>
+</div>
+</div>
+</div>
+<!-- Timetable Link -->
+<div>
+<a class="inline-flex items-center gap-2 text-surface-tint font-label-md text-label-md hover:underline group" href="#">
+                        View this section in Timetable Builder
+                        <span class="material-symbols-outlined text-[18px] group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
+</a>
+</div>
+<!-- Warning Banner -->
+<div class="bg-[#fefce8] border border-[#fef08a] rounded-lg p-4 flex gap-3 items-start mt-2">
+<span class="material-symbols-outlined text-warning-text mt-0.5" style="font-variation-settings: 'FILL' 1;">warning</span>
+<p class="font-body-sm text-body-sm text-warning-text">
+                        When this restriction lifts, enrolment is not guaranteed — the course may already be full. Consider a backup option.
+                    </p>
+</div>
+</div>
+<!-- Modal Footer -->
+<div class="px-container-padding py-4 border-t border-outline-variant/30 bg-background flex flex-col-reverse sm:flex-row justify-end gap-3 sm:items-center rounded-b-xl">
+<button class="px-6 py-2.5 rounded-lg border border-outline-variant text-on-surface font-label-md text-label-md hover:bg-surface-variant transition-colors bg-surface-container-lowest shadow-sm w-full sm:w-auto">
+                    Close
+                </button>
+<button class="px-6 py-2.5 rounded-lg bg-primary text-on-primary font-label-md text-label-md hover:bg-primary-container hover:text-on-primary-container transition-colors shadow-sm w-full sm:w-auto flex justify-center">
+                    Join Waitlist Instead
+                </button>
+</div>
+</div>
+</div>
+</body></html>
