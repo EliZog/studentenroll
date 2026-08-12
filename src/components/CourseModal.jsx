@@ -7,6 +7,9 @@ export default function CourseModal({
   selectedCourse,
   onAddToCart, 
   onEnrol,
+  onModifyEnrolment,
+  onModifyWaitlist,
+  onUpdateCart,
   enrolledCourses,
   waitlistedCourses,
   cartPlanA,
@@ -27,29 +30,50 @@ export default function CourseModal({
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
   const hours = [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
 
+  // Check if course already exists in enrolled, waitlist, or carts
+  const enrolledInstance = activeCourse ? enrolledCourses.find(c => c.code === activeCourse.code) : null;
+  const waitlistInstance = activeCourse ? waitlistedCourses.find(c => c.code === activeCourse.code) : null;
+  const cartAInstance = activeCourse ? cartPlanA.find(c => c.code === activeCourse.code) : null;
+  const cartBInstance = activeCourse ? cartPlanB.find(c => c.code === activeCourse.code) : null;
+
+  const activeInstance = enrolledInstance || waitlistInstance || cartAInstance || cartBInstance;
+
+  const currentSavedLec = activeInstance?.selectedSection?.id || "";
+  const currentSavedTut = activeInstance?.selectedSection?.selectedTutorial?.id || "";
+
+  const isChanged = (selectedLec !== currentSavedLec) || (selectedTut !== currentSavedTut);
+
   // Keep a local copy of the course so it doesn't disappear during exit animation
   useEffect(() => {
     if (selectedCourse) {
       setActiveCourse(selectedCourse);
-      setSelectedLec("");
-      setSelectedTut("");
+      
+      // Auto-select current configuration if user is already enrolled/waitlisted/carted
+      const enrolledInst = enrolledCourses.find(c => c.code === selectedCourse.code);
+      const waitlistInst = waitlistedCourses.find(c => c.code === selectedCourse.code);
+      const cartAInst = cartPlanA.find(c => c.code === selectedCourse.code);
+      const cartBInst = cartPlanB.find(c => c.code === selectedCourse.code);
+      const inst = enrolledInst || waitlistInst || cartAInst || cartBInst;
+
+      if (inst && inst.selectedSection) {
+        setSelectedLec(inst.selectedSection.id || "");
+        if (inst.selectedSection.selectedTutorial) {
+          setSelectedTut(inst.selectedSection.selectedTutorial.id || "");
+        } else {
+          setSelectedTut("");
+        }
+      } else {
+        setSelectedLec("");
+        setSelectedTut("");
+      }
       setError("");
     }
-  }, [selectedCourse]);
+  }, [selectedCourse, enrolledCourses, waitlistedCourses, cartPlanA, cartPlanB]);
 
   // If there has never been an active course yet, don't render anything
   if (!activeCourse) return null;
 
-  const isEnrolledOrWaitlisted = (courseCode) => {
-    return enrolledCourses.some(c => c.code === courseCode) || waitlistedCourses.some(c => c.code === courseCode);
-  };
-
   const handleAction = (actionType, plan = "A") => {
-    if (isEnrolledOrWaitlisted(activeCourse.code)) {
-      setError("You are already enrolled or waitlisted in this course.");
-      return;
-    }
-    
     // Find selected lecture section
     const lecObj = activeCourse.sections.find(s => s.id === selectedLec);
     if (!lecObj) {
@@ -79,6 +103,40 @@ export default function CourseModal({
       onEnrol(activeCourse, sectionWithTut);
       onClose();
     }
+  };
+
+  // Modify / Save Changes action handlers
+  const handleSaveChanges = () => {
+    const lecObj = activeCourse.sections.find(s => s.id === selectedLec);
+    if (!lecObj) {
+      setError("Please select a Lecture section.");
+      return;
+    }
+
+    let tutObj = null;
+    if (activeCourse.tutorials && activeCourse.tutorials.length > 0) {
+      tutObj = activeCourse.tutorials.find(t => t.id === selectedTut);
+      if (!tutObj) {
+        setError("Please select a Tutorial/Practical section.");
+        return;
+      }
+    }
+
+    const sectionWithTut = {
+      ...lecObj,
+      selectedTutorial: tutObj
+    };
+
+    if (enrolledInstance) {
+      onModifyEnrolment(activeCourse.code, sectionWithTut);
+    } else if (waitlistInstance) {
+      onModifyWaitlist(activeCourse.code, sectionWithTut);
+    } else if (cartAInstance) {
+      onUpdateCart(activeCourse.code, sectionWithTut, "A");
+    } else if (cartBInstance) {
+      onUpdateCart(activeCourse.code, sectionWithTut, "B");
+    }
+    onClose();
   };
 
   // Compile timetable mapping for live preview inside modal
@@ -303,6 +361,50 @@ export default function CourseModal({
                 </div>
               )}
 
+              {/* Status Banner Notification - Enrolled */}
+              {enrolledInstance && (
+                <div className="bg-green-50 border border-green-200 text-green-800 text-xs p-3.5 rounded-lg flex flex-col gap-1 shrink-0">
+                  <div className="font-bold flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-green-500 block animate-pulse"></span>
+                    <span>Currently Enrolled</span>
+                  </div>
+                  <p className="text-[11px] text-green-700 font-medium">
+                    You are registered in lecture section <b>{enrolledInstance.selectedSection?.name}</b>
+                    {enrolledInstance.selectedSection?.selectedTutorial ? ` and tutorial section ${enrolledInstance.selectedSection.selectedTutorial.name}` : ''}.
+                    {isChanged && <span className="text-amber-700 block mt-1 font-bold">⚠️ You have selected different sections. Click "Save Changes" below to update your enrolment.</span>}
+                  </p>
+                </div>
+              )}
+
+              {/* Status Banner Notification - Waitlisted */}
+              {waitlistInstance && (
+                <div className="bg-amber-50 border border-amber-200 text-amber-800 text-xs p-3.5 rounded-lg flex flex-col gap-1 shrink-0">
+                  <div className="font-bold flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-amber-500 block animate-pulse"></span>
+                    <span>Currently Waitlisted (Position #{waitlistInstance.waitlistPosition})</span>
+                  </div>
+                  <p className="text-[11px] text-amber-700 font-medium">
+                    You are waitlisted for lecture section <b>{waitlistInstance.selectedSection?.name}</b>
+                    {waitlistInstance.selectedSection?.selectedTutorial ? ` and tutorial section ${waitlistInstance.selectedSection.selectedTutorial.name}` : ''}.
+                    {isChanged && <span className="text-amber-800 block mt-1 font-bold">⚠️ You have selected different sections. Click "Modify Waitlist" below to update your choice.</span>}
+                  </p>
+                </div>
+              )}
+
+              {/* Status Banner Notification - Cart (Plan A or B) */}
+              {(cartAInstance || cartBInstance) && (
+                <div className="bg-purple-50 border border-purple-200 text-purple-800 text-xs p-3.5 rounded-lg flex flex-col gap-1 shrink-0">
+                  <div className="font-bold flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-purple-500 block animate-pulse"></span>
+                    <span>Pending in Cart (Plan {cartAInstance ? "A" : "B"})</span>
+                  </div>
+                  <p className="text-[11px] text-purple-700 font-medium">
+                    This course is in your Cart.
+                    {isChanged && <span className="text-purple-800 block mt-1 font-bold">⚠️ Click "Update Cart" below to save section modifications.</span>}
+                  </p>
+                </div>
+              )}
+
               {/* Course Description */}
               <div className="text-xs text-slate-500 leading-relaxed bg-slate-50 p-3 rounded">
                 {activeCourse.description}
@@ -391,39 +493,50 @@ export default function CourseModal({
 
             {/* Form Footer */}
             <div className="p-3.5 border-t border-slate-200 bg-slate-50 flex justify-end gap-2 shrink-0">
-              <button
-                disabled={isEnrolledOrWaitlisted(activeCourse.code)}
-                onClick={() => handleAction("cart", "A")}
-                className={`px-3 py-1.5 border rounded font-semibold text-xs shadow-xs transition-colors bg-white ${
-                  isEnrolledOrWaitlisted(activeCourse.code)
-                    ? "border-slate-100 text-slate-300 cursor-not-allowed"
-                    : "border-slate-200 text-slate-600 hover:bg-slate-50"
-                }`}
-              >
-                Add Plan A
-              </button>
-              <button
-                disabled={isEnrolledOrWaitlisted(activeCourse.code)}
-                onClick={() => handleAction("cart", "B")}
-                className={`px-3 py-1.5 border rounded font-semibold text-xs shadow-xs transition-colors bg-white ${
-                  isEnrolledOrWaitlisted(activeCourse.code)
-                    ? "border-slate-100 text-slate-300 cursor-not-allowed"
-                    : "border-slate-200 text-slate-600 hover:bg-slate-50"
-                }`}
-              >
-                Add Plan B
-              </button>
-              <button
-                disabled={isEnrolledOrWaitlisted(activeCourse.code)}
-                onClick={() => handleAction("enrol")}
-                className={`px-3 py-1.5 rounded font-semibold text-xs shadow-xs transition-colors text-white ${
-                  isEnrolledOrWaitlisted(activeCourse.code)
-                    ? "bg-slate-100 text-slate-300 cursor-not-allowed"
-                    : "bg-[#002a5c] hover:bg-[#001b3f]"
-                }`}
-              >
-                Enrol
-              </button>
+              {activeInstance ? (
+                // Modify/Save Changes Button Mode
+                <>
+                  <button
+                    onClick={onClose}
+                    className="px-3.5 py-1.5 border border-slate-200 hover:bg-slate-100 text-slate-600 rounded text-xs font-semibold bg-white transition-colors"
+                  >
+                    Close
+                  </button>
+                  <button
+                    disabled={!isChanged}
+                    onClick={handleSaveChanges}
+                    className={`px-4 py-1.5 rounded font-bold text-xs shadow-xs transition-colors text-white ${
+                      isChanged 
+                        ? "bg-[#002a5c] hover:bg-[#001b3f]" 
+                        : "bg-slate-300 cursor-not-allowed opacity-80"
+                    }`}
+                  >
+                    {enrolledInstance ? "Save Changes" : waitlistInstance ? "Modify Waitlist" : "Update Cart"}
+                  </button>
+                </>
+              ) : (
+                // Default Add / Enrol Button Mode
+                <>
+                  <button
+                    onClick={() => handleAction("cart", "A")}
+                    className="px-3 py-1.5 border rounded font-semibold text-xs shadow-xs transition-colors bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+                  >
+                    Add Plan A
+                  </button>
+                  <button
+                    onClick={() => handleAction("cart", "B")}
+                    className="px-3 py-1.5 border rounded font-semibold text-xs shadow-xs transition-colors bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+                  >
+                    Add Plan B
+                  </button>
+                  <button
+                    onClick={() => handleAction("enrol")}
+                    className="px-3 py-1.5 rounded font-semibold text-xs shadow-xs transition-colors text-white bg-[#002a5c] hover:bg-[#001b3f]"
+                  >
+                    Enrol
+                  </button>
+                </>
+              )}
             </div>
           </div>
 

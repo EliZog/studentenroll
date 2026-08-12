@@ -30,9 +30,10 @@ export default function Courses({
   const [searchQuery, setSearchQuery] = useState("");
   const [showAutocomplete, setShowAutocomplete] = useState(false);
   
-  // Restriction Modal states
+  // Restriction Modal states (decoupled from search course modal selection)
   const [restrictionOpen, setRestrictionOpen] = useState(false);
-  const [selectedSection, setSelectedSection] = useState(null);
+  const [restrictionCourse, setRestrictionCourse] = useState(null);
+  const [restrictionSection, setRestrictionSection] = useState(null);
 
   // Backup program select state
   const [selectedProgram, setSelectedProgram] = useState("Computer Science Specialist");
@@ -67,8 +68,8 @@ export default function Courses({
   // Enrol flow
   const handleEnrol = (course, sectionWithTut) => {
     if (sectionWithTut.restricted) {
-      setSelectedCourse(course);
-      setSelectedSection(sectionWithTut);
+      setRestrictionCourse(course);
+      setRestrictionSection(sectionWithTut);
       setRestrictionOpen(true);
     } else {
       // Remove from carts
@@ -79,20 +80,57 @@ export default function Courses({
     }
   };
 
+  // Modify existing enrolment section choices
+  const handleModifyEnrolment = (courseCode, sectionWithTut) => {
+    if (sectionWithTut.restricted) {
+      const course = mockCourses.find(c => c.code === courseCode);
+      setRestrictionCourse(course);
+      setRestrictionSection(sectionWithTut);
+      setRestrictionOpen(true);
+    } else {
+      setEnrolledCourses(enrolledCourses.map(c => 
+        c.code === courseCode ? { ...c, selectedSection: sectionWithTut } : c
+      ));
+    }
+  };
+
+  // Modify existing waitlist section choices
+  const handleModifyWaitlist = (courseCode, sectionWithTut) => {
+    setWaitlistedCourses(waitlistedCourses.map(c => 
+      c.code === courseCode ? { ...c, selectedSection: sectionWithTut } : c
+    ));
+  };
+
+  // Update existing cart section choices
+  const handleUpdateCart = (courseCode, sectionWithTut, plan) => {
+    if (plan === "A") {
+      setCartPlanA(cartPlanA.map(c => 
+        c.code === courseCode ? { ...c, selectedSection: sectionWithTut } : c
+      ));
+    } else {
+      setCartPlanB(cartPlanB.map(c => 
+        c.code === courseCode ? { ...c, selectedSection: sectionWithTut } : c
+      ));
+    }
+  };
+
   // Waitlist callback from modal
   const handleJoinWaitlist = () => {
-    if (!selectedCourse || !selectedSection) return;
+    if (!restrictionCourse || !restrictionSection) return;
 
     // Remove from carts
-    setCartPlanA(cartPlanA.filter(c => c.code !== selectedCourse.code));
-    setCartPlanB(cartPlanB.filter(c => c.code !== selectedCourse.code));
+    setCartPlanA(cartPlanA.filter(c => c.code !== restrictionCourse.code));
+    setCartPlanB(cartPlanB.filter(c => c.code !== restrictionCourse.code));
+
+    // Remove from enrolled courses if swapping to waitlist
+    setEnrolledCourses(enrolledCourses.filter(c => c.code !== restrictionCourse.code));
 
     setWaitlistedCourses([
       ...waitlistedCourses,
       {
-        ...selectedCourse,
-        selectedSection: selectedSection,
-        waitlistPosition: selectedSection.waitlistCount + 1
+        ...restrictionCourse,
+        selectedSection: restrictionSection,
+        waitlistPosition: restrictionSection.waitlistCount + 1
       }
     ]);
   };
@@ -228,7 +266,15 @@ export default function Courses({
                   <div key={course.code} className="border border-green-200 bg-green-50/10 rounded-lg p-4 flex justify-between items-start gap-4">
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-sm text-[#166534]">{course.code}</span>
+                        <button
+                          onClick={() => {
+                            setSelectedCourse(course);
+                            setIsSearchOpen(true);
+                          }}
+                          className="font-bold text-sm text-[#166534] hover:underline"
+                        >
+                          {course.code}
+                        </button>
                         <span className="px-2 py-0.5 rounded bg-green-100 text-green-800 text-[9px] font-bold uppercase tracking-wider">
                           Active Enrolled
                         </span>
@@ -271,7 +317,15 @@ export default function Courses({
                   <div key={course.code} className="border border-amber-200 bg-amber-50/10 rounded-lg p-4 flex justify-between items-start gap-4">
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-sm text-amber-700">{course.code}</span>
+                        <button
+                          onClick={() => {
+                            setSelectedCourse(course);
+                            setIsSearchOpen(true);
+                          }}
+                          className="font-bold text-sm text-amber-700 hover:underline"
+                        >
+                          {course.code}
+                        </button>
                         <span className="px-2 py-0.5 rounded bg-amber-100 text-amber-800 text-[9px] font-bold uppercase tracking-wider">
                           Waitlist #{course.waitlistPosition}
                         </span>
@@ -355,7 +409,15 @@ export default function Courses({
                   <div key={course.code} className="border border-slate-200 bg-slate-50/50 rounded-lg p-4 flex justify-between items-start gap-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-sm text-slate-800">{course.code}</span>
+                        <button
+                          onClick={() => {
+                            setSelectedCourse(course);
+                            setIsSearchOpen(true);
+                          }}
+                          className="font-bold text-sm text-slate-800 hover:underline"
+                        >
+                          {course.code}
+                        </button>
                         <span className="px-2 py-0.5 rounded bg-[#e7eeff] text-[#002a5c] text-[9px] font-bold uppercase tracking-wider">
                           Pending
                         </span>
@@ -440,6 +502,9 @@ export default function Courses({
         selectedCourse={selectedCourse}
         onAddToCart={handleAddToCart}
         onEnrol={handleEnrol}
+        onModifyEnrolment={handleModifyEnrolment}
+        onModifyWaitlist={handleModifyWaitlist}
+        onUpdateCart={handleUpdateCart}
         enrolledCourses={enrolledCourses}
         waitlistedCourses={waitlistedCourses}
         cartPlanA={cartPlanA}
@@ -450,10 +515,14 @@ export default function Courses({
       {/* Restriction Modal Overlay */}
       <RestrictionModal
         isOpen={restrictionOpen}
-        onClose={() => setRestrictionOpen(false)}
+        onClose={() => {
+          setRestrictionOpen(false);
+          setRestrictionCourse(null);
+          setRestrictionSection(null);
+        }}
         onJoinWaitlist={handleJoinWaitlist}
-        course={selectedCourse}
-        section={selectedSection}
+        course={restrictionCourse}
+        section={restrictionSection}
       />
 
     </div>

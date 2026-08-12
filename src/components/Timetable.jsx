@@ -87,8 +87,8 @@ export default function Timetable({
       }
 
       // 2. Tutorial event (if present)
-      if (section.tutorial) {
-        const tut = section.tutorial;
+      if (section.selectedTutorial) {
+        const tut = section.selectedTutorial;
         
         let tutColor = "bg-slate-50 border-slate-200 text-slate-700";
         if (course.status === "Waitlisted") {
