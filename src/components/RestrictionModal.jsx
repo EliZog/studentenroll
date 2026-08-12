@@ -100,13 +100,19 @@ export default function RestrictionModal({ isOpen, onClose, onJoinWaitlist, cour
             {/* Detail Rows */}
             <div className="flex flex-col gap-3">
               {restrictionDetail.temporary && (
-                <div className="flex items-center gap-3 text-slate-500 text-xs">
+                <div className="flex items-center gap-3 text-slate-500 text-xs font-semibold">
                   <Clock className="w-4 h-4 text-slate-400 shrink-0" />
                   <span>Temporary Restriction</span>
                 </div>
               )}
+              {restrictionDetail.openEnrolmentDate && (
+                <div className="flex items-center gap-3 text-slate-500 text-xs font-semibold">
+                  <Clock className="w-4 h-4 text-slate-400 shrink-0" />
+                  <span>Priority lifts & Open Enrolment begins: <b className="text-slate-700">{restrictionDetail.openEnrolmentDate}</b></span>
+                </div>
+              )}
               {restrictionDetail.reviewDate && (
-                <div className="flex items-center gap-3 text-slate-500 text-xs">
+                <div className="flex items-center gap-3 text-slate-500 text-xs font-semibold">
                   <Calendar className="w-4 h-4 text-slate-400 shrink-0" />
                   <span>Restriction review: {restrictionDetail.reviewDate}</span>
                 </div>

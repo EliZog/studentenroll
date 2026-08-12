@@ -8,7 +8,7 @@ import Timetable from "./components/Timetable";
 import AcademicHistory from "./components/AcademicHistory";
 import Finances from "./components/Finances";
 import { studentInfo } from "./data/mockData";
-import { Bell, User, LogOut } from "lucide-react";
+import { Bell, User, LogOut, Sparkles } from "lucide-react";
 import "./App.css";
 
 export default function App() {
@@ -21,8 +21,21 @@ export default function App() {
   const [cartPlanB, setCartPlanB] = useState([]);
   const [enrolledCourses, setEnrolledCourses] = useState([]);
   const [waitlistedCourses, setWaitlistedCourses] = useState([]);
-  const [showWaitlistOnSchedule, setShowWaitlistOnSchedule] = useState(false); // Waitlisted courses on timetable are off by default
+  const [showWaitlistOnSchedule, setShowWaitlistOnSchedule] = useState(false); 
   const [showUserDropdown, setShowUserDropdown] = useState(false);
+
+  // Notification simulation states
+  const [activeToast, setActiveToast] = useState(null);
+  const [hasUnreadNotification, setHasUnreadNotification] = useState(true);
+  const [showNotificationMenu, setShowNotificationMenu] = useState(false);
+  const [notifications, setNotifications] = useState([
+    {
+      id: 1,
+      title: "Waitlist Warning Lift Date",
+      msg: "Priority enrolment details updated for CSC358H5. Open registration starts Aug 15.",
+      time: "2 hours ago"
+    }
+  ]);
 
   const handleLogin = (id) => {
     setUtorid(id);
@@ -38,6 +51,49 @@ export default function App() {
     setEnrolledCourses([]);
     setWaitlistedCourses([]);
     setShowWaitlistOnSchedule(false);
+  };
+
+  // Simulate background waitlist shift notification
+  const simulateWaitlistUpdate = () => {
+    if (waitlistedCourses.length > 0) {
+      const waitlistCourse = waitlistedCourses[0];
+      
+      // Remove from waitlist
+      setWaitlistedCourses(waitlistedCourses.filter(c => c.code !== waitlistCourse.code));
+      // Move to enrolled
+      setEnrolledCourses([...enrolledCourses, { ...waitlistCourse, status: "Enrolled" }]);
+
+      const newNotification = {
+        id: Date.now(),
+        title: "Waitlist Enrolment Success!",
+        msg: `Good news! A spot opened up and you have been successfully enrolled in ${waitlistCourse.code} (${waitlistCourse.selectedSection?.name}).`,
+        time: "Just now"
+      };
+
+      setNotifications([newNotification, ...notifications]);
+      setHasUnreadNotification(true);
+      setActiveToast(`🎉 Waitlisted course success! Enrolled in ${waitlistCourse.code}.`);
+      
+      setTimeout(() => {
+        setActiveToast(null);
+      }, 5000);
+    } else {
+      // Simulate general MAT223 shift if no waitlisted courses exist
+      const newNotification = {
+        id: Date.now(),
+        title: "Waitlist Position Shift",
+        msg: "Waitlist Update: You have moved from Position #4 to Position #3 in MAT223H1.",
+        time: "Just now"
+      };
+      
+      setNotifications([newNotification, ...notifications]);
+      setHasUnreadNotification(true);
+      setActiveToast("📈 Waitlist Update: You shifted to Position #3 in MAT223H1.");
+      
+      setTimeout(() => {
+        setActiveToast(null);
+      }, 5000);
+    }
   };
 
   const getPageTitle = () => {
@@ -67,6 +123,14 @@ export default function App() {
   return (
     <div className="flex flex-col h-screen w-screen bg-slate-50 text-slate-800 overflow-hidden font-sans">
       
+      {/* Absolute Toast Notification Alert */}
+      {activeToast && (
+        <div className="fixed top-16 right-6 bg-[#002a5c] text-white px-5 py-3.5 rounded-lg shadow-lg z-[2000] animate-in slide-in-from-right-8 duration-300 font-bold text-xs border border-[#001736] flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-green-400 animate-ping"></span>
+          <span>{activeToast}</span>
+        </div>
+      )}
+
       {/* Top Header Bar */}
       <header className="bg-[#002a5c] text-white py-3 px-6 flex justify-between items-center shadow-md border-b border-[#001636] z-50 shrink-0 select-none">
         
@@ -93,15 +157,52 @@ export default function App() {
         {/* User profile, notifications, search */}
         <div className="flex items-center gap-4 relative">
           
-          {/* Notifications Bell */}
-          <button 
-            onClick={() => setActiveTab("dashboard")}
-            className="p-1.5 rounded-full hover:bg-white/10 transition-colors relative"
-            aria-label="View notifications"
-          >
-            <Bell className="w-5 h-5 text-slate-200" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-amber-500"></span>
-          </button>
+          {/* Notifications Bell Dropdown */}
+          <div className="relative">
+            <button 
+              onClick={() => {
+                setShowNotificationMenu(!showNotificationMenu);
+                setHasUnreadNotification(false);
+              }}
+              className="p-1.5 rounded-full hover:bg-white/10 transition-colors relative"
+              aria-label="View notifications"
+            >
+              <Bell className="w-5 h-5 text-slate-200" />
+              {hasUnreadNotification && (
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+              )}
+            </button>
+
+            {showNotificationMenu && (
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setShowNotificationMenu(false)}></div>
+                <div className="absolute right-0 mt-2 w-72 bg-white rounded border border-slate-200 shadow-md py-1.5 z-50 animate-in fade-in slide-in-from-top-1 duration-150 text-xs font-semibold text-slate-700">
+                  <div className="px-4 py-2 border-b border-slate-100 text-slate-400 font-bold uppercase tracking-wider text-[9px] flex justify-between items-center">
+                    <span>Notifications ({notifications.length})</span>
+                    <button 
+                      onClick={() => setNotifications([])}
+                      className="text-[8px] text-[#002a5c] hover:underline"
+                    >
+                      Clear all
+                    </button>
+                  </div>
+                  <div className="max-h-60 overflow-y-auto custom-scrollbar flex flex-col">
+                    {notifications.length === 0 ? (
+                      <div className="p-4 text-slate-400 text-center font-medium">No new notifications.</div>
+                    ) : (
+                      notifications.map(n => (
+                        <div key={n.id} className="p-3 border-b border-slate-100 last:border-b-0 flex flex-col gap-0.5 hover:bg-slate-50 transition-colors">
+                          <span className="font-bold text-[#002a5c]">{n.title}</span>
+                          <span className="text-[10px] text-slate-500 font-medium leading-relaxed">{n.msg}</span>
+                          <span className="text-[8px] text-slate-400 mt-0.5">{n.time}</span>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
 
           {/* User Settings Dropdown Toggle */}
           <div className="relative">
@@ -119,7 +220,7 @@ export default function App() {
             {showUserDropdown && (
               <>
                 <div className="fixed inset-0 z-40" onClick={() => setShowUserDropdown(false)}></div>
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded border border-slate-200 shadow-md py-1 z-50 animate-in fade-in slide-in-from-top-1 duration-150 text-xs font-semibold text-slate-700">
+                <div className="absolute right-0 mt-2 w-52 bg-white rounded border border-slate-200 shadow-md py-1 z-50 animate-in fade-in slide-in-from-top-1 duration-150 text-xs font-semibold text-slate-700">
                   <div className="px-4 py-2 border-b border-slate-100 text-slate-400 font-bold uppercase tracking-wider text-[9px]">
                     UTORid: {utorid}
                   </div>
@@ -131,6 +232,16 @@ export default function App() {
                     className="w-full text-left px-4 py-2.5 hover:bg-slate-50 transition-colors"
                   >
                     Profile & Settings
+                  </button>
+                  <button
+                    onClick={() => {
+                      simulateWaitlistUpdate();
+                      setShowUserDropdown(false);
+                    }}
+                    className="w-full text-left px-4 py-2.5 text-[#0060df] hover:bg-[#e2f1ff] transition-colors flex items-center gap-1.5 border-t border-slate-100 font-bold"
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>Simulate Waitlist Shift</span>
                   </button>
                   <button
                     onClick={handleLogout}
@@ -194,7 +305,7 @@ export default function App() {
             <Finances 
               activeTab={activeTab} 
               setActiveTab={setActiveTab} 
-            />
+              />
           )}
         </main>
       </div>

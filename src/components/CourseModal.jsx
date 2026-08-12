@@ -410,6 +410,66 @@ export default function CourseModal({
                 {activeCourse.description}
               </div>
 
+              {/* Syllabus & Offering Deadlines */}
+              <div className="flex flex-col gap-2 bg-slate-50 border border-slate-200 p-3 rounded-lg text-xs font-semibold text-slate-700 shrink-0">
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-400 font-medium">Syllabus:</span>
+                  <a href={activeCourse.syllabusUrl || "#"} className="text-acorn-blue hover:underline flex items-center gap-1 font-bold">
+                    <span>📄 View Syllabus.pdf (Concept)</span>
+                  </a>
+                </div>
+                <div className="h-px bg-slate-200 w-full"></div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400 font-medium">Waitlist Deadline:</span>
+                  <span className="text-slate-600 font-bold">{activeCourse.waitlistDeadline || "TBA"}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400 font-medium">Next Offering:</span>
+                  <span className="text-slate-600 font-bold">{activeCourse.nextOffering || "TBA"}</span>
+                </div>
+              </div>
+
+              {/* RateMyProf Past Instructors Widget */}
+              {activeCourse.pastInstructors && activeCourse.pastInstructors.length > 0 && (
+                <div className="flex flex-col gap-2 shrink-0 border border-slate-200 rounded-lg p-3.5 bg-[#f8fafc]/50">
+                  <h5 className="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Past Instructors (RateMyProf rating)</h5>
+                  <div className="flex flex-col gap-2">
+                    {activeCourse.pastInstructors.map(inst => (
+                      <div key={inst.name} className="flex justify-between items-center text-xs border-b border-slate-100 last:border-b-0 pb-1.5 last:pb-0 font-medium">
+                        <div>
+                          <p className="font-bold text-slate-700">{inst.name}</p>
+                          <p className="text-[10px] text-slate-400 mt-0.5">{inst.reviewsCount} reviews</p>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded bg-[#e2f1ff] text-[#0060df] text-[10px] font-bold border border-[#b8dbff]">
+                            ⭐ {inst.rating.toFixed(1)}/5.0
+                          </span>
+                          <p className="text-[9px] text-slate-500 mt-0.5 font-bold">{inst.takeAgain} would take again</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Alternative Course Suggestions */}
+              {activeCourse.suggestedAlternatives && activeCourse.suggestedAlternatives.length > 0 && (
+                <div className="bg-[#eff6ff] border border-[#bfdbfe] rounded-lg p-3.5 flex flex-col gap-2 shrink-0">
+                  <h5 className="text-[10px] font-bold text-blue-700 tracking-wider uppercase">Suggested Alternatives</h5>
+                  <p className="text-[10.5px] text-slate-600 font-medium leading-relaxed">
+                    This course is currently highly in-demand. If waitlisted or blocked, consider these available alternative courses that satisfy matching requirements:
+                  </p>
+                  <div className="flex flex-col gap-1.5 mt-1">
+                    {activeCourse.suggestedAlternatives.map(alt => (
+                      <div key={alt.code} className="flex justify-between items-center text-xs font-bold text-slate-800 bg-white px-3 py-2 rounded border border-blue-100 shadow-xs">
+                        <span>{alt.code} — {alt.title}</span>
+                        <span className="text-[9px] font-bold text-blue-600 uppercase">Available</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Lecture Radio Select */}
               <div className="flex flex-col gap-2">
                 <h5 className="text-[9px] font-bold text-slate-400 tracking-wider uppercase">Select Lecture Section</h5>

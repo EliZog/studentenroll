@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import CourseModal from "./CourseModal";
 import RestrictionModal from "./RestrictionModal";
-import { programBackups, mockCourses } from "../data/mockData";
+import { programBackups, mockCourses, registrationFaqs } from "../data/mockData";
 
 export default function Courses({
   cartPlanA,
@@ -29,6 +29,9 @@ export default function Courses({
   // Autocomplete state
   const [searchQuery, setSearchQuery] = useState("");
   const [showAutocomplete, setShowAutocomplete] = useState(false);
+
+  // FAQ state
+  const [expandedFaq, setExpandedFaq] = useState(null);
   
   // Restriction Modal states (decoupled from search course modal selection)
   const [restrictionOpen, setRestrictionOpen] = useState(false);
@@ -314,39 +317,61 @@ export default function Courses({
             ) : (
               <div className="flex flex-col gap-3">
                 {waitlistedCourses.map(course => (
-                  <div key={course.code} className="border border-amber-200 bg-amber-50/10 rounded-lg p-4 flex justify-between items-start gap-4">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => {
-                            setSelectedCourse(course);
-                            setIsSearchOpen(true);
-                          }}
-                          className="font-bold text-sm text-amber-700 hover:underline"
-                        >
-                          {course.code}
-                        </button>
-                        <span className="px-2 py-0.5 rounded bg-amber-100 text-amber-800 text-[9px] font-bold uppercase tracking-wider">
-                          Waitlist #{course.waitlistPosition}
-                        </span>
-                      </div>
-                      <h4 className="font-bold text-slate-700 text-xs mt-1">{course.title}</h4>
-                      <p className="text-xs text-slate-500 mt-2 font-medium">
-                        {course.selectedSection?.name} — {course.selectedSection?.time} ({course.selectedSection?.location})
-                      </p>
-                      {course.selectedSection?.selectedTutorial && (
-                        <p className="text-xs text-slate-500 font-medium">
-                          {course.selectedSection.selectedTutorial.name} — {course.selectedSection.selectedTutorial.time} ({course.selectedSection.selectedTutorial.location})
+                  <div key={course.code} className="border border-amber-200 bg-amber-50/10 rounded-lg p-4 flex flex-col gap-3 relative">
+                    <div className="flex justify-between items-start gap-4">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => {
+                              setSelectedCourse(course);
+                              setIsSearchOpen(true);
+                            }}
+                            className="font-bold text-sm text-amber-700 hover:underline"
+                          >
+                            {course.code}
+                          </button>
+                          <span className="px-2 py-0.5 rounded bg-amber-100 text-amber-800 text-[9px] font-bold uppercase tracking-wider">
+                            Waitlist #{course.waitlistPosition}
+                          </span>
+                        </div>
+                        <h4 className="font-bold text-slate-700 text-xs mt-1">{course.title}</h4>
+                        <p className="text-xs text-slate-500 mt-2 font-medium">
+                          {course.selectedSection?.name} — {course.selectedSection?.time} ({course.selectedSection?.location})
                         </p>
-                      )}
+                        {course.selectedSection?.selectedTutorial && (
+                          <p className="text-xs text-slate-500 font-medium">
+                            {course.selectedSection.selectedTutorial.name} — {course.selectedSection.selectedTutorial.time} ({course.selectedSection.selectedTutorial.location})
+                          </p>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => handleRemove(course.code, "waitlisted")}
+                        className="text-slate-400 hover:text-red-600 transition-colors p-1"
+                        aria-label="Remove waitlist"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
-                    <button
-                      onClick={() => handleRemove(course.code, "waitlisted")}
-                      className="text-slate-400 hover:text-red-600 transition-colors p-1"
-                      aria-label="Remove waitlist"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+
+                    {/* Waitlist Probability & Analytics Widget */}
+                    {course.waitlistAnalytics && (
+                      <div className="pt-3.5 border-t border-amber-100 flex flex-wrap gap-x-4 gap-y-2 text-[10.5px] font-semibold text-slate-700">
+                        <div className="flex items-center gap-1">
+                          <span className="text-slate-400 font-medium">Odds of entry:</span>
+                          <span className={`px-2 py-0.5 rounded-full border text-[9px] font-bold uppercase tracking-wider ${course.waitlistAnalytics.likelihoodColor}`}>
+                            {course.waitlistAnalytics.likelihood} ({course.waitlistAnalytics.historicalOdds})
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <span className="text-slate-400 font-medium">Drop Rate:</span>
+                          <span className="text-slate-600 font-bold">{course.waitlistAnalytics.dropRate}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <span className="text-slate-400 font-medium">Deadline:</span>
+                          <span className="text-slate-600 font-bold">{course.waitlistDeadline}</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -488,6 +513,36 @@ export default function Courses({
 
         </div>
 
+      </div>
+
+      {/* Collapsible FAQ Accordion Widget */}
+      <div className="bg-white rounded-lg border border-[#dde3ed] p-5 shadow-sm shrink-0">
+        <h3 className="text-sm font-bold text-slate-800 border-b border-slate-100 pb-3 uppercase tracking-wider">
+          Registration & Waitlist FAQ
+        </h3>
+        <div className="flex flex-col gap-3 mt-4">
+          {registrationFaqs.map((faq, idx) => {
+            const isFaqOpen = expandedFaq === idx;
+            return (
+              <div key={idx} className="border border-slate-200 rounded-lg overflow-hidden transition-all bg-white font-medium">
+                <button
+                  onClick={() => setExpandedFaq(isFaqOpen ? null : idx)}
+                  className="w-full text-left px-4 py-3.5 flex justify-between items-center bg-slate-50/50 hover:bg-slate-50 transition-colors font-bold text-xs text-[#002a5c]"
+                >
+                  <span>{faq.question}</span>
+                  <span className="text-slate-400 text-base leading-none font-semibold">{isFaqOpen ? "−" : "+"}</span>
+                </button>
+                <div 
+                  className={`transition-all duration-300 ease-in-out overflow-hidden text-xs text-slate-600 leading-relaxed ${
+                    isFaqOpen ? "max-h-40 border-t border-slate-100 p-4 opacity-100 bg-[#fafcfd]/50" : "max-h-0 opacity-0"
+                  }`}
+                >
+                  {faq.answer}
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {/* Course Search Overlay Popup */}

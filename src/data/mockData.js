@@ -19,6 +19,23 @@ export const mockCourses = [
     term: "Winter 2027 (S)",
     department: "Department of Mathematical & Computational Sciences",
     description: "Computer networks, with focus on Internet protocols and architectures. Topics include: physical layer standards, data link protocols (Ethernet, Wi-Fi), packet switching, routing algorithms, transport layer protocols (TCP, UDP), network applications, congestion control, and resource allocation.",
+    syllabusUrl: "#",
+    nextOffering: "Winter 2028 (S)",
+    waitlistDeadline: "January 18, 2027",
+    suggestedAlternatives: [
+      { code: "CSC369H5", title: "Operating Systems" },
+      { code: "CSC324H5", title: "Principles of Programming Languages" }
+    ],
+    pastInstructors: [
+      { name: "Dr. Alan Turing", rating: 4.8, takeAgain: "94%", reviewsCount: 42 },
+      { name: "Prof. Grace Hopper", rating: 4.9, takeAgain: "96%", reviewsCount: 38 }
+    ],
+    waitlistAnalytics: {
+      likelihood: "High",
+      likelihoodColor: "text-green-600 bg-green-50 border-green-200",
+      historicalOdds: "91%",
+      dropRate: "2.4 students/day"
+    },
     sections: [
       {
         id: "csc358-lec0101",
@@ -28,7 +45,7 @@ export const mockCourses = [
         startHour: 15,
         endHour: 17,
         location: "MN 1190",
-        instructor: "TBA",
+        instructor: "Dr. Alan Turing",
         enrolled: 120,
         capacity: 120,
         waitlistCount: 11,
@@ -38,7 +55,8 @@ export const mockCourses = [
           reason: "This lecture section is currently reserved for Computer Science specialists.",
           temporary: true,
           reviewDate: "July 24, 2026",
-          contact: "Dept of Mathematical & Computational Sciences"
+          contact: "Dept of Mathematical & Computational Sciences",
+          openEnrolmentDate: "August 15, 2026 @ 9:00 AM"
         }
       },
       {
@@ -83,6 +101,23 @@ export const mockCourses = [
     term: "Fall 2026 (F)",
     department: "Department of Computer Science",
     description: "Introduction to database management systems. The relational model, relational algebra, SQL query language, database design (entity-relationship modeling, normal forms), database application programming (databases on the Web, JDBC), transaction management fundamentals (concurrency, recovery).",
+    syllabusUrl: "#",
+    nextOffering: "Fall 2027 (F)",
+    waitlistDeadline: "September 15, 2026",
+    suggestedAlternatives: [
+      { code: "CSC309H1", title: "Programming on the Web" },
+      { code: "CSC343H5", title: "Introduction to Databases (UTM)" }
+    ],
+    pastInstructors: [
+      { name: "Dr. Edgar Codd", rating: 4.6, takeAgain: "88%", reviewsCount: 55 },
+      { name: "Prof. Donald Chamberlin", rating: 4.3, takeAgain: "82%", reviewsCount: 30 }
+    ],
+    waitlistAnalytics: {
+      likelihood: "Medium",
+      likelihoodColor: "text-amber-600 bg-amber-50 border-amber-200",
+      historicalOdds: "68%",
+      dropRate: "1.2 students/day"
+    },
     sections: [
       {
         id: "csc343-lec0101",
@@ -102,7 +137,8 @@ export const mockCourses = [
           reason: "Priority is given to Year 3/4 Computer Science students in the Faculty of Arts & Science.",
           temporary: true,
           reviewDate: "August 12, 2026",
-          contact: "Undergraduate CS Office"
+          contact: "Undergraduate CS Office",
+          openEnrolmentDate: "August 20, 2026 @ 9:00 AM"
         }
       }
     ],
@@ -124,6 +160,22 @@ export const mockCourses = [
     term: "Fall 2026 (F)",
     department: "Department of Computer Science",
     description: "Abstract data types and data structures (stacks, queues, lists, trees, graphs). Object-oriented programming: inheritance, interfaces, polymorphism. Recursion, algorithm analysis (big-O notation), sorting and searching. Software engineering concepts: testing, debugging.",
+    syllabusUrl: "#",
+    nextOffering: "Winter 2027 (S)",
+    waitlistDeadline: "September 15, 2026",
+    suggestedAlternatives: [
+      { code: "CSC108H1", title: "Introduction to Computer Programming" },
+      { code: "APS105H1", title: "Computer Fundamentals" }
+    ],
+    pastInstructors: [
+      { name: "Prof. Campbell", rating: 4.5, takeAgain: "90%", reviewsCount: 112 }
+    ],
+    waitlistAnalytics: {
+      likelihood: "High",
+      likelihoodColor: "text-green-600 bg-green-50 border-green-200",
+      historicalOdds: "95%",
+      dropRate: "4.1 students/day"
+    },
     sections: [
       {
         id: "csc148-lec0101",
@@ -158,6 +210,22 @@ export const mockCourses = [
     term: "Full Year 2026-2027 (Y)",
     department: "Department of Mathematics",
     description: "A theoretical course in calculus, emphasizing proofs, conceptual understanding, and computational skills. Real numbers, limits, continuity, derivatives, Mean Value Theorem, Riemann integration, Fundamental Theorem of Calculus, sequences, series, Taylor series, vector calculus overview.",
+    syllabusUrl: "#",
+    nextOffering: "Full Year 2027-2028 (Y)",
+    waitlistDeadline: "September 22, 2026",
+    suggestedAlternatives: [
+      { code: "MAT135H1", title: "Calculus I" },
+      { code: "MAT157Y1", title: "Analysis I" }
+    ],
+    pastInstructors: [
+      { name: "Alfonso Gracia-Saz", rating: 4.9, takeAgain: "98%", reviewsCount: 160 }
+    ],
+    waitlistAnalytics: {
+      likelihood: "High",
+      likelihoodColor: "text-green-600 bg-green-50 border-green-200",
+      historicalOdds: "88%",
+      dropRate: "3.5 students/day"
+    },
     sections: [
       {
         id: "mat137-lec0101",
@@ -193,6 +261,21 @@ export const mockCourses = [
     term: "Fall 2026 (F)",
     department: "Department of Mathematics",
     description: "Systems of linear equations, matrix algebra, determinants, vector spaces, linear transformations, eigenvalues and eigenvectors, orthogonality, Gram-Schmidt process, and applications.",
+    syllabusUrl: "#",
+    nextOffering: "Winter 2027 (S)",
+    waitlistDeadline: "September 15, 2026",
+    suggestedAlternatives: [
+      { code: "MAT240H1", title: "Algebra I" }
+    ],
+    pastInstructors: [
+      { name: "Prof. Newton", rating: 4.2, takeAgain: "75%", reviewsCount: 65 }
+    ],
+    waitlistAnalytics: {
+      likelihood: "High",
+      likelihoodColor: "text-green-600 bg-green-50 border-green-200",
+      historicalOdds: "92%",
+      dropRate: "3.8 students/day"
+    },
     sections: [
       {
         id: "mat223-lec0101",
@@ -202,7 +285,7 @@ export const mockCourses = [
         startHour: 10,
         endHour: 12,
         location: "MP 102",
-        instructor: "TBA",
+        instructor: "Prof. Newton",
         enrolled: 290,
         capacity: 300,
         waitlistCount: 0,
@@ -227,6 +310,21 @@ export const mockCourses = [
     term: "Fall 2026 (F)",
     department: "Rotman Commerce",
     description: "An introduction to financial accounting for business. Covers general ledger entries, financial statements, cash flow statements, and analysis of corporate financial reports.",
+    syllabusUrl: "#",
+    nextOffering: "Winter 2027 (S)",
+    waitlistDeadline: "September 15, 2026",
+    suggestedAlternatives: [
+      { code: "MGT120H5", title: "Financial Accounting UTM" }
+    ],
+    pastInstructors: [
+      { name: "Prof. Ledger", rating: 4.1, takeAgain: "79%", reviewsCount: 40 }
+    ],
+    waitlistAnalytics: {
+      likelihood: "High",
+      likelihoodColor: "text-green-600 bg-green-50 border-green-200",
+      historicalOdds: "85%",
+      dropRate: "2.1 students/day"
+    },
     sections: [
       {
         id: "mgt120-lec0101",
@@ -261,6 +359,21 @@ export const mockCourses = [
     term: "Fall 2026 (F)",
     department: "Department of Economics",
     description: "An introductory course describing the pricing system, supply and demand, cost curves, market configurations, monopoly power, and government interventions.",
+    syllabusUrl: "#",
+    nextOffering: "Winter 2027 (S)",
+    waitlistDeadline: "September 15, 2026",
+    suggestedAlternatives: [
+      { code: "ECO105Y1", title: "Introduction to Economics" }
+    ],
+    pastInstructors: [
+      { name: "Dr. Adam Smith", rating: 4.7, takeAgain: "92%", reviewsCount: 140 }
+    ],
+    waitlistAnalytics: {
+      likelihood: "High",
+      likelihoodColor: "text-green-600 bg-green-50 border-green-200",
+      historicalOdds: "90%",
+      dropRate: "2.9 students/day"
+    },
     sections: [
       {
         id: "eco101-lec0101",
@@ -295,6 +408,21 @@ export const mockCourses = [
     term: "Full Year 2026-2027 (Y)",
     department: "Department of Mathematics",
     description: "Mathematics for Rotman Commerce students. Optimization, functions of multiple variables, matrices, determinants, vector calculations, simple and compound interest.",
+    syllabusUrl: "#",
+    nextOffering: "Full Year 2027-2028 (Y)",
+    waitlistDeadline: "September 22, 2026",
+    suggestedAlternatives: [
+      { code: "MAT135H1", title: "Calculus I" }
+    ],
+    pastInstructors: [
+      { name: "Prof. Euler", rating: 4.4, takeAgain: "86%", reviewsCount: 90 }
+    ],
+    waitlistAnalytics: {
+      likelihood: "High",
+      likelihoodColor: "text-green-600 bg-green-50 border-green-200",
+      historicalOdds: "87%",
+      dropRate: "2.3 students/day"
+    },
     sections: [
       {
         id: "mat133-lec0101",
@@ -329,6 +457,21 @@ export const mockCourses = [
     term: "Winter 2027 (S)",
     department: "Department of Mathematical & Computational Sciences",
     description: "Hypothesis testing, estimation, linear regression models, analysis of variance, non-parametric procedures, and maximum likelihood statistics.",
+    syllabusUrl: "#",
+    nextOffering: "Winter 2028 (S)",
+    waitlistDeadline: "January 18, 2027",
+    suggestedAlternatives: [
+      { code: "STA258H5", title: "Probability & Statistics II UTM" }
+    ],
+    pastInstructors: [
+      { name: "Prof. Bayes", rating: 4.6, takeAgain: "91%", reviewsCount: 45 }
+    ],
+    waitlistAnalytics: {
+      likelihood: "High",
+      likelihoodColor: "text-green-600 bg-green-50 border-green-200",
+      historicalOdds: "92%",
+      dropRate: "1.9 students/day"
+    },
     sections: [
       {
         id: "sta260-lec0101",
@@ -363,6 +506,21 @@ export const mockCourses = [
     term: "Fall 2026 (F)",
     department: "Department of Mathematical & Computational Sciences",
     description: "An introduction to computer programming using Python. Covers variables, functions, conditional blocks, iteration, lists, dictionaries, string utilities, and files.",
+    syllabusUrl: "#",
+    nextOffering: "Winter 2027 (S)",
+    waitlistDeadline: "September 15, 2026",
+    suggestedAlternatives: [
+      { code: "CSC108H1", title: "Introduction to Programming St.G" }
+    ],
+    pastInstructors: [
+      { name: "Prof. Guido", rating: 4.8, takeAgain: "95%", reviewsCount: 210 }
+    ],
+    waitlistAnalytics: {
+      likelihood: "High",
+      likelihoodColor: "text-green-600 bg-green-50 border-green-200",
+      historicalOdds: "94%",
+      dropRate: "4.8 students/day"
+    },
     sections: [
       {
         id: "csc108-lec0101",
@@ -372,7 +530,7 @@ export const mockCourses = [
         startHour: 9,
         endHour: 11,
         location: "IB 120",
-        instructor: "TBA",
+        instructor: "Prof. Guido",
         enrolled: 300,
         capacity: 350,
         waitlistCount: 0,
@@ -467,3 +625,22 @@ export const mockFinancialAccount = {
     { id: "tx003", date: "2026-08-01", description: "OSAP Funding Pending Deferral", amount: 3450.00, type: "deferral" }
   ]
 };
+
+export const registrationFaqs = [
+  {
+    question: "When does priority registration lift for restricted courses?",
+    answer: "Priority registration restriction periods end on defined dates depending on course codes and departments. For Fall term courses, priority restrictions typically lift around mid-to-late August. View the specific restriction lift date directly on the blocked course information popup inside ACORN."
+  },
+  {
+    question: "How is the waitlist entry likelihood calculated?",
+    answer: "Waitlist entry likelihood (High/Medium/Low) is an estimate based on historical enrollment trends of the previous three academic years, your active waitlist position, and the historical drop velocity (drops per day) for each specific course code."
+  },
+  {
+    question: "What happens when my waitlist position shifts to a confirmed enrolment?",
+    answer: "ACORN will automatically enrol you in the course and notify you via a top-bar alert notification. You do not need to manually accept; the course status will transition from 'Waitlisted' to 'Active Enrolled'."
+  },
+  {
+    question: "Can I join multiple waitlists for the same requirement?",
+    answer: "Yes, but U of T limits total active registrations plus waitlisted credits per semester (usually up to 3.0 credits per term). If you get enrolled from a waitlist that creates a conflict, you should drop your alternative course section promptly."
+  }
+];
