@@ -138,7 +138,7 @@ export default function App() {
         {/* Crest & Title */}
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
-            <img src={logo} alt="UofT Crest" className="h-9 w-auto object-contain bg-white p-0.5 rounded shadow-xs" />
+            <img src={logo} alt="UofT Crest" className="h-12 w-auto object-contain" />
             <div className="flex flex-col leading-none">
               <span className="text-[10px] font-semibold text-slate-200 tracking-wider">UNIVERSITY OF TORONTO</span>
               <span className="text-lg font-black tracking-widest text-white mt-0.5">ACORN</span>

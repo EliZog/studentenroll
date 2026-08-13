@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import logo from "../assets/logo.png";
 
 export default function Login({ onLogin }) {
   const [utorid, setUtorid] = useState("millerel");
@@ -19,11 +20,7 @@ export default function Login({ onLogin }) {
       {/* Top Banner */}
       <div className="bg-[#002a5c] py-4 border-b-4 border-[#e3e9f3] px-6">
         <div className="max-w-4xl mx-auto flex items-center gap-3">
-          {/* UofT crest style shield placeholder */}
-          <div className="w-9 h-11 bg-white flex items-center justify-center rounded-sm font-bold text-[#002a5c] text-xs border border-slate-300 shadow-sm relative overflow-hidden">
-            <div className="absolute top-0 left-0 right-0 h-3 bg-[#002a5c]"></div>
-            <span className="mt-2">U T</span>
-          </div>
+          <img src={logo} alt="UofT Crest" className="h-16 w-auto object-contain" />
           <div>
             <h1 className="text-white font-semibold text-lg tracking-wide leading-none">UNIVERSITY OF</h1>
             <h1 className="text-white font-bold text-xl tracking-wider leading-none">TORONTO</h1>
