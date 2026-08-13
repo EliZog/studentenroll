@@ -19,6 +19,9 @@ export default function CourseModal({
   // Retain the last selected course during the fade-out transition
   const [activeCourse, setActiveCourse] = useState(null);
 
+  // Modal active tab state: "select" (Choices) or "info" (Info & Ratings)
+  const [modalTab, setModalTab] = useState("select");
+
   // Form states
   const [selectedLec, setSelectedLec] = useState("");
   const [selectedTut, setSelectedTut] = useState("");
@@ -47,7 +50,8 @@ export default function CourseModal({
   useEffect(() => {
     if (selectedCourse) {
       setActiveCourse(selectedCourse);
-      
+      setModalTab("select"); // Reset default active tab to selection choices
+
       // Auto-select current configuration if user is already enrolled/waitlisted/carted
       const enrolledInst = enrolledCourses.find(c => c.code === selectedCourse.code);
       const waitlistInst = waitlistedCourses.find(c => c.code === selectedCourse.code);
@@ -353,6 +357,32 @@ export default function CourseModal({
               <p className="text-[9px] text-slate-400 mt-0.5">{activeCourse.department}</p>
             </div>
 
+            {/* Modal Left Column Tab Switcher */}
+            <div className="flex border-b border-slate-100 shrink-0 bg-white">
+              <button
+                type="button"
+                onClick={() => setModalTab("select")}
+                className={`flex-1 text-center py-2.5 text-[11px] font-bold border-b-2 transition-all ${
+                  modalTab === "select"
+                    ? "border-[#002a5c] text-[#002a5c]"
+                    : "border-transparent text-slate-400 hover:text-slate-600"
+                }`}
+              >
+                Enrolment Choices
+              </button>
+              <button
+                type="button"
+                onClick={() => setModalTab("info")}
+                className={`flex-1 text-center py-2.5 text-[11px] font-bold border-b-2 transition-all ${
+                  modalTab === "info"
+                    ? "border-[#002a5c] text-[#002a5c]"
+                    : "border-transparent text-slate-400 hover:text-slate-600"
+                }`}
+              >
+                Course Info & Ratings
+              </button>
+            </div>
+
             {/* Form Body (Scrollable) */}
             <div className="p-5 overflow-y-auto custom-scrollbar flex-1 flex flex-col gap-4">
               {error && (
@@ -361,192 +391,201 @@ export default function CourseModal({
                 </div>
               )}
 
-              {/* Status Banner Notification - Enrolled */}
-              {enrolledInstance && (
-                <div className="bg-green-50 border border-green-200 text-green-800 text-xs p-3.5 rounded-lg flex flex-col gap-1 shrink-0">
-                  <div className="font-bold flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-green-500 block animate-pulse"></span>
-                    <span>Currently Enrolled</span>
-                  </div>
-                  <p className="text-[11px] text-green-700 font-medium">
-                    You are registered in lecture section <b>{enrolledInstance.selectedSection?.name}</b>
-                    {enrolledInstance.selectedSection?.selectedTutorial ? ` and tutorial section ${enrolledInstance.selectedSection.selectedTutorial.name}` : ''}.
-                    {isChanged && <span className="text-amber-700 block mt-1 font-bold">⚠️ You have selected different sections. Click "Save Changes" below to update your enrolment.</span>}
-                  </p>
-                </div>
-              )}
-
-              {/* Status Banner Notification - Waitlisted */}
-              {waitlistInstance && (
-                <div className="bg-amber-50 border border-amber-200 text-amber-800 text-xs p-3.5 rounded-lg flex flex-col gap-1 shrink-0">
-                  <div className="font-bold flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-amber-500 block animate-pulse"></span>
-                    <span>Currently Waitlisted (Position #{waitlistInstance.waitlistPosition})</span>
-                  </div>
-                  <p className="text-[11px] text-amber-700 font-medium">
-                    You are waitlisted for lecture section <b>{waitlistInstance.selectedSection?.name}</b>
-                    {waitlistInstance.selectedSection?.selectedTutorial ? ` and tutorial section ${waitlistInstance.selectedSection.selectedTutorial.name}` : ''}.
-                    {isChanged && <span className="text-amber-800 block mt-1 font-bold">⚠️ You have selected different sections. Click "Modify Waitlist" below to update your choice.</span>}
-                  </p>
-                </div>
-              )}
-
-              {/* Status Banner Notification - Cart (Plan A or B) */}
-              {(cartAInstance || cartBInstance) && (
-                <div className="bg-purple-50 border border-purple-200 text-purple-800 text-xs p-3.5 rounded-lg flex flex-col gap-1 shrink-0">
-                  <div className="font-bold flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-purple-500 block animate-pulse"></span>
-                    <span>Pending in Cart (Plan {cartAInstance ? "A" : "B"})</span>
-                  </div>
-                  <p className="text-[11px] text-purple-700 font-medium">
-                    This course is in your Cart.
-                    {isChanged && <span className="text-purple-800 block mt-1 font-bold">⚠️ Click "Update Cart" below to save section modifications.</span>}
-                  </p>
-                </div>
-              )}
-
-              {/* Course Description */}
-              <div className="text-xs text-slate-500 leading-relaxed bg-slate-50 p-3 rounded">
-                {activeCourse.description}
-              </div>
-
-              {/* Syllabus & Offering Deadlines */}
-              <div className="flex flex-col gap-2 bg-slate-50 border border-slate-200 p-3 rounded-lg text-xs font-semibold text-slate-700 shrink-0">
-                <div className="flex justify-between items-center">
-                  <span className="text-slate-400 font-medium">Syllabus:</span>
-                  <a href={activeCourse.syllabusUrl || "#"} className="text-acorn-blue hover:underline flex items-center gap-1 font-bold">
-                    <span>📄 View Syllabus.pdf (Concept)</span>
-                  </a>
-                </div>
-                <div className="h-px bg-slate-200 w-full"></div>
-                <div className="flex justify-between">
-                  <span className="text-slate-400 font-medium">Waitlist Deadline:</span>
-                  <span className="text-slate-600 font-bold">{activeCourse.waitlistDeadline || "TBA"}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-400 font-medium">Next Offering:</span>
-                  <span className="text-slate-600 font-bold">{activeCourse.nextOffering || "TBA"}</span>
-                </div>
-              </div>
-
-              {/* RateMyProf Past Instructors Widget */}
-              {activeCourse.pastInstructors && activeCourse.pastInstructors.length > 0 && (
-                <div className="flex flex-col gap-2 shrink-0 border border-slate-200 rounded-lg p-3.5 bg-[#f8fafc]/50">
-                  <h5 className="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Past Instructors (RateMyProf rating)</h5>
-                  <div className="flex flex-col gap-2">
-                    {activeCourse.pastInstructors.map(inst => (
-                      <div key={inst.name} className="flex justify-between items-center text-xs border-b border-slate-100 last:border-b-0 pb-1.5 last:pb-0 font-medium">
-                        <div>
-                          <p className="font-bold text-slate-700">{inst.name}</p>
-                          <p className="text-[10px] text-slate-400 mt-0.5">{inst.reviewsCount} reviews</p>
-                        </div>
-                        <div className="text-right shrink-0">
-                          <span className="inline-flex items-center px-2 py-0.5 rounded bg-[#e2f1ff] text-[#0060df] text-[10px] font-bold border border-[#b8dbff]">
-                            ⭐ {inst.rating.toFixed(1)}/5.0
-                          </span>
-                          <p className="text-[9px] text-slate-500 mt-0.5 font-bold">{inst.takeAgain} would take again</p>
-                        </div>
+              {modalTab === "select" ? (
+                // TAB 1: Enrolment Choices (Action-focused)
+                <>
+                  {/* Status Banner Notification - Enrolled */}
+                  {enrolledInstance && (
+                    <div className="bg-green-50 border border-green-200 text-green-800 text-xs p-3.5 rounded-lg flex flex-col gap-1 shrink-0">
+                      <div className="font-bold flex items-center gap-1.5">
+                        <span className="w-2.5 h-2.5 rounded-full bg-green-500 block animate-pulse"></span>
+                        <span>Currently Enrolled</span>
                       </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+                      <p className="text-[11px] text-green-700 font-medium">
+                        You are registered in lecture section <b>{enrolledInstance.selectedSection?.name}</b>
+                        {enrolledInstance.selectedSection?.selectedTutorial ? ` and tutorial section ${enrolledInstance.selectedSection.selectedTutorial.name}` : ''}.
+                        {isChanged && <span className="text-amber-700 block mt-1 font-bold">⚠️ You have selected different sections. Click "Save Changes" below to update your enrolment.</span>}
+                      </p>
+                    </div>
+                  )}
 
-              {/* Alternative Course Suggestions */}
-              {activeCourse.suggestedAlternatives && activeCourse.suggestedAlternatives.length > 0 && (
-                <div className="bg-[#eff6ff] border border-[#bfdbfe] rounded-lg p-3.5 flex flex-col gap-2 shrink-0">
-                  <h5 className="text-[10px] font-bold text-blue-700 tracking-wider uppercase">Suggested Alternatives</h5>
-                  <p className="text-[10.5px] text-slate-600 font-medium leading-relaxed">
-                    This course is currently highly in-demand. If waitlisted or blocked, consider these available alternative courses that satisfy matching requirements:
-                  </p>
-                  <div className="flex flex-col gap-1.5 mt-1">
-                    {activeCourse.suggestedAlternatives.map(alt => (
-                      <div key={alt.code} className="flex justify-between items-center text-xs font-bold text-slate-800 bg-white px-3 py-2 rounded border border-blue-100 shadow-xs">
-                        <span>{alt.code} — {alt.title}</span>
-                        <span className="text-[9px] font-bold text-blue-600 uppercase">Available</span>
+                  {/* Status Banner Notification - Waitlisted */}
+                  {waitlistInstance && (
+                    <div className="bg-amber-50 border border-amber-200 text-amber-800 text-xs p-3.5 rounded-lg flex flex-col gap-1 shrink-0">
+                      <div className="font-bold flex items-center gap-1.5">
+                        <span className="w-2.5 h-2.5 rounded-full bg-amber-500 block animate-pulse"></span>
+                        <span>Currently Waitlisted (Position #{waitlistInstance.waitlistPosition})</span>
                       </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+                      <p className="text-[11px] text-amber-700 font-medium">
+                        You are waitlisted for lecture section <b>{waitlistInstance.selectedSection?.name}</b>
+                        {waitlistInstance.selectedSection?.selectedTutorial ? ` and tutorial section ${waitlistInstance.selectedSection.selectedTutorial.name}` : ''}.
+                        {isChanged && <span className="text-amber-800 block mt-1 font-bold">⚠️ You have selected different sections. Click "Modify Waitlist" below to update your choice.</span>}
+                      </p>
+                    </div>
+                  )}
 
-              {/* Lecture Radio Select */}
-              <div className="flex flex-col gap-2">
-                <h5 className="text-[9px] font-bold text-slate-400 tracking-wider uppercase">Select Lecture Section</h5>
-                <div className="flex flex-col gap-2">
-                  {activeCourse.sections.map(section => (
-                    <label 
-                      key={section.id}
-                      className={`border rounded-lg p-3 flex items-start gap-2.5 cursor-pointer transition-all hover:bg-slate-50/50 ${
-                        selectedLec === section.id 
-                          ? "border-acorn-blue bg-blue-50/10 shadow-xs" 
-                          : "border-slate-200"
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        name="lecture"
-                        value={section.id}
-                        checked={selectedLec === section.id}
-                        onChange={() => setSelectedLec(section.id)}
-                        className="mt-1 text-acorn-blue focus:ring-acorn-blue"
-                      />
-                      <div className="flex-1 flex justify-between items-start gap-2">
-                        <div>
-                          <div className="flex items-center gap-1.5">
-                            <span className="font-bold text-xs text-slate-800">{section.name}</span>
-                            {section.restricted && (
-                              <span className="px-1.5 py-0.2 rounded bg-amber-50 text-amber-700 border border-amber-100 text-[8px] font-bold uppercase">
-                                Restricted
-                              </span>
-                            )}
+                  {/* Status Banner Notification - Cart (Plan A or B) */}
+                  {(cartAInstance || cartBInstance) && (
+                    <div className="bg-purple-50 border border-purple-200 text-purple-800 text-xs p-3.5 rounded-lg flex flex-col gap-1 shrink-0">
+                      <div className="font-bold flex items-center gap-1.5">
+                        <span className="w-2.5 h-2.5 rounded-full bg-purple-500 block animate-pulse"></span>
+                        <span>Pending in Cart (Plan {cartAInstance ? "A" : "B"})</span>
+                      </div>
+                      <p className="text-[11px] text-purple-700 font-medium">
+                        This course is in your Cart.
+                        {isChanged && <span className="text-purple-800 block mt-1 font-bold">⚠️ Click "Update Cart" below to save section modifications.</span>}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Suggested Alternatives (Always placed right above section selectors) */}
+                  {activeCourse.suggestedAlternatives && activeCourse.suggestedAlternatives.length > 0 && (
+                    <div className="bg-[#eff6ff] border border-[#bfdbfe] rounded-lg p-3.5 flex flex-col gap-2 shrink-0">
+                      <h5 className="text-[10px] font-bold text-blue-700 tracking-wider uppercase">Suggested Alternatives</h5>
+                      <p className="text-[10.5px] text-slate-600 font-medium leading-relaxed">
+                        This course is highly in-demand. If waitlisted or blocked, consider these available alternatives:
+                      </p>
+                      <div className="flex flex-col gap-1.5 mt-1">
+                        {activeCourse.suggestedAlternatives.map(alt => (
+                          <div key={alt.code} className="flex justify-between items-center text-xs font-bold text-slate-800 bg-white px-3 py-2 rounded border border-blue-100 shadow-xs">
+                            <span>{alt.code} — {alt.title}</span>
+                            <span className="text-[9px] font-bold text-blue-600 uppercase">Available</span>
                           </div>
-                          <p className="text-xs text-slate-600 mt-1">{section.time}</p>
-                          <p className="text-[9px] text-slate-400 mt-0.5">{section.location} • {section.instructor}</p>
-                        </div>
-                        <div className="text-right shrink-0">
-                          <span className="text-[10px] text-slate-500 font-semibold flex items-center gap-1 justify-end">
-                            <Users className="w-3 h-3 text-slate-400" />
-                            <span>{section.enrolled}/{section.capacity}</span>
-                          </span>
-                        </div>
+                        ))}
                       </div>
-                    </label>
-                  ))}
-                </div>
-              </div>
+                    </div>
+                  )}
 
-              {/* Tutorial/Practical Radio Select */}
-              {activeCourse.tutorials && activeCourse.tutorials.length > 0 && (
-                <div className="flex flex-col gap-2">
-                  <h5 className="text-[9px] font-bold text-slate-400 tracking-wider uppercase">Select Practical / Tutorial Section</h5>
+                  {/* Lecture Radio Select */}
                   <div className="flex flex-col gap-2">
-                    {activeCourse.tutorials.map(tut => (
-                      <label 
-                        key={tut.id}
-                        className={`border rounded-lg p-3 flex items-start gap-2.5 cursor-pointer transition-all hover:bg-slate-50/50 ${
-                          selectedTut === tut.id 
-                            ? "border-acorn-blue bg-blue-50/10 shadow-xs" 
-                            : "border-slate-200"
-                        }`}
-                      >
-                        <input
-                          type="radio"
-                          name="tutorial"
-                          value={tut.id}
-                          checked={selectedTut === tut.id}
-                          onChange={() => setSelectedTut(tut.id)}
-                          className="mt-1 text-acorn-blue focus:ring-acorn-blue"
-                        />
-                        <div className="flex-1 text-left">
-                          <span className="font-bold text-xs text-slate-800">{tut.name}</span>
-                          <p className="text-xs text-slate-600 mt-1">{tut.time}</p>
-                          <p className="text-[9px] text-slate-400 mt-0.5">{tut.location}</p>
-                        </div>
-                      </label>
-                    ))}
+                    <h5 className="text-[9px] font-bold text-slate-400 tracking-wider uppercase">Select Lecture Section</h5>
+                    <div className="flex flex-col gap-2">
+                      {activeCourse.sections.map(section => (
+                        <label 
+                          key={section.id}
+                          className={`border rounded-lg p-3 flex items-start gap-2.5 cursor-pointer transition-all hover:bg-slate-50/50 ${
+                            selectedLec === section.id 
+                              ? "border-acorn-blue bg-blue-50/10 shadow-xs" 
+                              : "border-slate-200"
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name="lecture"
+                            value={section.id}
+                            checked={selectedLec === section.id}
+                            onChange={() => setSelectedLec(section.id)}
+                            className="mt-1 text-acorn-blue focus:ring-acorn-blue"
+                          />
+                          <div className="flex-1 flex justify-between items-start gap-2">
+                            <div>
+                              <div className="flex items-center gap-1.5">
+                                <span className="font-bold text-xs text-slate-800">{section.name}</span>
+                                {section.restricted && (
+                                  <span className="px-1.5 py-0.2 rounded bg-amber-50 text-amber-700 border border-amber-100 text-[8px] font-bold uppercase">
+                                    Restricted
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-xs text-slate-600 mt-1">{section.time}</p>
+                              <p className="text-[9px] text-slate-400 mt-0.5">{section.location} • {section.instructor}</p>
+                            </div>
+                            <div className="text-right shrink-0">
+                              <span className="text-[10px] text-slate-500 font-semibold flex items-center gap-1 justify-end">
+                                <Users className="w-3 h-3 text-slate-400" />
+                                <span>{section.enrolled}/{section.capacity}</span>
+                              </span>
+                            </div>
+                          </div>
+                        </label>
+                      ))}
+                    </div>
                   </div>
-                </div>
+
+                  {/* Tutorial/Practical Radio Select */}
+                  {activeCourse.tutorials && activeCourse.tutorials.length > 0 && (
+                    <div className="flex flex-col gap-2">
+                      <h5 className="text-[9px] font-bold text-slate-400 tracking-wider uppercase">Select Practical / Tutorial Section</h5>
+                      <div className="flex flex-col gap-2">
+                        {activeCourse.tutorials.map(tut => (
+                          <label 
+                            key={tut.id}
+                            className={`border rounded-lg p-3 flex items-start gap-2.5 cursor-pointer transition-all hover:bg-slate-50/50 ${
+                              selectedTut === tut.id 
+                                ? "border-acorn-blue bg-blue-50/10 shadow-xs" 
+                                : "border-slate-200"
+                            }`}
+                          >
+                            <input
+                              type="radio"
+                              name="tutorial"
+                              value={tut.id}
+                              checked={selectedTut === tut.id}
+                              onChange={() => setSelectedTut(tut.id)}
+                              className="mt-1 text-acorn-blue focus:ring-acorn-blue"
+                            />
+                            <div className="flex-1 text-left">
+                              <span className="font-bold text-xs text-slate-800">{tut.name}</span>
+                              <p className="text-xs text-slate-600 mt-1">{tut.time}</p>
+                              <p className="text-[9px] text-slate-400 mt-0.5">{tut.location}</p>
+                            </div>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </>
+              ) : (
+                // TAB 2: Course Info & Ratings (Reference-focused)
+                <>
+                  {/* Course Description */}
+                  <div className="text-xs text-slate-500 leading-relaxed bg-slate-50 p-3.5 rounded-lg border border-slate-100">
+                    <p className="font-bold text-[#002a5c] text-[10px] uppercase tracking-wider mb-1.5">Course Description</p>
+                    <p>{activeCourse.description}</p>
+                  </div>
+
+                  {/* Syllabus & Offering Deadlines */}
+                  <div className="flex flex-col gap-2 bg-slate-50 border border-slate-200 p-3.5 rounded-lg text-xs font-semibold text-slate-700 shrink-0">
+                    <div className="flex justify-between items-center">
+                      <span className="text-slate-400 font-medium">Syllabus:</span>
+                      <a href={activeCourse.syllabusUrl || "#"} className="text-acorn-blue hover:underline flex items-center gap-1 font-bold">
+                        <span>📄 View Syllabus.pdf (Concept)</span>
+                      </a>
+                    </div>
+                    <div className="h-px bg-slate-200 w-full my-0.5"></div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400 font-medium">Waitlist Deadline:</span>
+                      <span className="text-slate-600 font-bold">{activeCourse.waitlistDeadline || "TBA"}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400 font-medium">Next Offering:</span>
+                      <span className="text-slate-600 font-bold">{activeCourse.nextOffering || "TBA"}</span>
+                    </div>
+                  </div>
+
+                  {/* RateMyProf Past Instructors Widget */}
+                  {activeCourse.pastInstructors && activeCourse.pastInstructors.length > 0 && (
+                    <div className="flex flex-col gap-2 shrink-0 border border-slate-200 rounded-lg p-3.5 bg-[#f8fafc]/50">
+                      <h5 className="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Past Instructors (RateMyProf rating)</h5>
+                      <div className="flex flex-col gap-2">
+                        {activeCourse.pastInstructors.map(inst => (
+                          <div key={inst.name} className="flex justify-between items-center text-xs border-b border-slate-100 last:border-b-0 pb-1.5 last:pb-0 font-medium">
+                            <div>
+                              <p className="font-bold text-slate-700">{inst.name}</p>
+                              <p className="text-[10px] text-slate-400 mt-0.5">{inst.reviewsCount} reviews</p>
+                            </div>
+                            <div className="text-right shrink-0">
+                              <span className="inline-flex items-center px-2 py-0.5 rounded bg-[#e2f1ff] text-[#0060df] text-[10px] font-bold border border-[#b8dbff]">
+                                ⭐ {inst.rating.toFixed(1)}/5.0
+                              </span>
+                              <p className="text-[9px] text-slate-500 mt-0.5 font-bold">{inst.takeAgain} would take again</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
 
             </div>
