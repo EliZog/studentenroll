@@ -9,6 +9,7 @@ import AcademicHistory from "./components/AcademicHistory";
 import Finances from "./components/Finances";
 import { studentInfo } from "./data/mockData";
 import { Bell, User, LogOut, Sparkles } from "lucide-react";
+import logo from "./assets/logo.png";
 import "./App.css";
 
 export default function App() {
@@ -137,10 +138,7 @@ export default function App() {
         {/* Crest & Title */}
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-10 bg-white flex items-center justify-center rounded-sm font-extrabold text-[#002a5c] text-[10px] border border-[#001b3f] shadow-xs relative overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-2 bg-[#002a5c]"></div>
-              <span className="mt-1">U T</span>
-            </div>
+            <img src={logo} alt="UofT Crest" className="h-9 w-auto object-contain bg-white p-0.5 rounded shadow-xs" />
             <div className="flex flex-col leading-none">
               <span className="text-[10px] font-semibold text-slate-200 tracking-wider">UNIVERSITY OF TORONTO</span>
               <span className="text-lg font-black tracking-widest text-white mt-0.5">ACORN</span>
